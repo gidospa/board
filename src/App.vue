@@ -1,28 +1,68 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+<div id="app">
+  <Member :members="members" @changeMemberList="changeMemberList"></Member>
+  <Field :members="members" @changePlayerInfo="changePlayerInfo"></Field>
+</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Field from './components/Field.vue'
+import Member from './components/Member.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Field,
+    Member
+  },
+  data() {
+    return {
+      members: ''
+    }
+  },
+  methods: {
+    changeMemberList(memberList) {
+      this.members = memberList
+    },
+    changePlayerInfo(players) {
+      let members = [Array(players.length),Array(players.length)]
+
+      // sort by 'team' and 'id'
+      for (let p of players) {
+        members[p.team][p.id] = `${p.number},${p.name}`
+      }
+
+      // to string
+      let strMembers = ''
+      for (let team = 0; team < 2; team++) {
+        for (let p of members[team]) {
+          if (p) {
+            strMembers += p + '\n'
+          }
+        }
+        strMembers += '\n' // seperator of each team
+      }
+      this.members = strMembers
+    }
   }
 }
 </script>
 
 <style>
+* {
+  font-family: "Yu Gothic", "YuGothic", Arial, sans-serif;
+  color: #444;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+button {
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #888;
+  background-color: white;
+  text-decoration: none;
 }
 </style>
