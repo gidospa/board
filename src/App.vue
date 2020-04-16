@@ -1,7 +1,17 @@
 <template>
 <div id="app">
-  <Member :members="members" @changeMemberList="changeMemberList"></Member>
-  <Field :members="members" @changePlayerInfo="changePlayerInfo"></Field>
+  <Member
+    :members="members"
+    :colors="colors"
+    @changeMemberList="changeMemberList"
+    @changeTeamColors="changeTeamColors">
+  </Member>
+  <Field 
+    :members="members"
+    :colors="colors"
+    @changePlayerInfo="changePlayerInfo" 
+    @changeTeamColors="changeTeamColors">
+  </Field>
 </div>
 </template>
 
@@ -17,12 +27,17 @@ export default {
   },
   data() {
     return {
-      members: ''
+      members: '',
+      colors: ''
     }
   },
   methods: {
     changeMemberList(memberList) {
       this.members = memberList
+    },
+    changeTeamColors(colors) {
+      this.colors = colors
+      console.log(this.colors)
     },
     changePlayerInfo(players) {
       let members = [Array(players.length),Array(players.length)]

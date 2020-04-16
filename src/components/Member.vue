@@ -40,7 +40,8 @@
 <script>
 export default {
   props: {
-    members: String
+    members: String,
+    colors: String,
   },
   data() {
     return {
@@ -81,18 +82,17 @@ export default {
       this.home = m[0]
       this.away = m[1]
     },
-    homeColor: function(newColor) {
-      console.log(newColor)
-      let rgb = [
-        parseInt(newColor.substring(1, 3), 16),
-        parseInt(newColor.substring(3, 5), 16),
-        parseInt(newColor.substring(5, 7), 16),
-      ]
-      console.log(rgb.join(','))
+    colors: function() {
+      let c = this.colors.split(',')
+      this.homeColor = c[0]
+      this.awayColor = c[1]
     },
-    awayColor: function(newColor) {
-      console.log(newColor)
-    }
+    homeColor: function() {
+      this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
+    },
+    awayColor: function() {
+      this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
+    },
   }
 }
 </script>

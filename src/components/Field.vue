@@ -119,7 +119,8 @@ import Players from '../utils/players.js'
   
 export default {
   props: {
-    members: String
+    members: String,
+    colors: String
   },
   data() {
     return {
@@ -271,6 +272,7 @@ export default {
           if (p.length > 1) {
             this.selectedPlayer.name = p[1].trim()
           }
+          this.$emit('changePlayerInfo', this.players)
         }
       }
     },
@@ -379,6 +381,20 @@ export default {
 
     this.$emit('changePlayerInfo', this.players)
 
+    // RGB to Hex
+    let teamColor = ''
+    let delimiter = ','
+    for (let t = 0; t < this.teamColor.length; t++) {
+      let rgba = this.teamColor[t].split('(')[1].split(')')[0].split(',')
+      teamColor += '#'
+      for (let c = 0; c < 3; c++) {
+        teamColor += `0${parseInt(rgba[c]).toString(16)}`.slice(-2)
+      }
+      teamColor += delimiter
+      delimiter = ''
+    }
+    this.$emit('changeTeamColors', teamColor)
+
     this.visibility.forEach((team) => {
       for (let i = 0; i < this.config.NUMBER_OF_PLAYERS; i++) {
         team.push('visibile')
@@ -418,6 +434,24 @@ export default {
         player.number = newPlayer[0]
         player.name = newPlayer[1]
       })
+    },
+    colors: function(newColors) {
+      let c = newColors.split(',')
+      if (c.length != 2) return
+      let home = [ // Hex to RGB
+        parseInt(c[0].substring(1, 3), 16),
+        parseInt(c[0].substring(3, 5), 16),
+        parseInt(c[0].substring(5, 7), 16)
+      ]
+      let away = [ // Hex to RGB
+        parseInt(c[1].substring(1, 3), 16),
+        parseInt(c[1].substring(3, 5), 16),
+        parseInt(c[1].substring(5, 7), 16)
+      ]
+      this.teamColor = [
+        `rgba(${home.join(',')}, 0.8)`,
+        `rgba(${away.join(',')}, 0.8)`,
+      ]
     }
   }
 }
