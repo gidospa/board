@@ -4,11 +4,13 @@
     :members="members"
     :colors="colors"
     @changeMemberList="changeMemberList"
-    @changeTeamColors="changeTeamColors">
+    @changeTeamColors="changeTeamColors"
+    @changeEnds="changeEnds">
   </Member>
   <Field 
     :members="members"
     :colors="colors"
+    :isChangeEnds="isChangeEnds"
     @changePlayerInfo="changePlayerInfo" 
     @changeTeamColors="changeTeamColors">
   </Field>
@@ -28,7 +30,8 @@ export default {
   data() {
     return {
       members: '',
-      colors: ''
+      colors: '',
+      isChangeEnds: false
     }
   },
   methods: {
@@ -58,6 +61,9 @@ export default {
         strMembers += '\n' // seperator of each team
       }
       this.members = strMembers
+    },
+    changeEnds() {
+      this.isChangeEnds = this.isChangeEnds ? false : true
     }
   }
 }

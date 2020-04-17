@@ -7,7 +7,7 @@
     <textarea v-model="home" @blur="onBlur()" spellcheck="false"/>
   </div>
   <div class="member">
-    <button id="changing-ends">Changing ends</button>
+    <button type="button" onfocus="this.blur()" id="changing-ends" @click="onClickChange">Changing ends</button>
   </div>
   <div class="member">
     <textarea v-model="away" @blur="onBlur()" spellcheck="false"/>
@@ -74,6 +74,9 @@ export default {
       this.home = m[0]
       this.away = m[1]
       this.$emit("changeMemberList", newMember)
+    },
+    onClickChange() {
+      this.$emit('changeEnds')
     }
   },
   watch: {

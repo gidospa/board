@@ -120,7 +120,8 @@ import Players from '../utils/players.js'
 export default {
   props: {
     members: String,
-    colors: String
+    colors: String,
+    isChangeEnds: Boolean
   },
   data() {
     return {
@@ -239,7 +240,7 @@ export default {
       // click filed
       if (this.fieldClick) {
         console.log('field click!!', this.fieldClick)
-
+        
         // click bench area
         let fieldBottom = this.isLandscape ? this.fieldClick.y : this.fieldClick.x
         if (fieldBottom > (this.config.normalized.field.h + this.config.normalized.margin.top)*this.fieldWidth) {
@@ -358,6 +359,24 @@ export default {
 
       console.log('screen: ', this.screenWidth, this.screenHeight)
       console.log('field: ', this.fieldWidth, this.fieldHeight)
+    },
+    changeEnds() {
+      // rotation matrix
+      // |X|   | -1,  0, 2cx |   |x|
+      // |Y| = |  0, -1, 2cy | x |y|
+      // |1| = |  0,  0,   1 |   |1|
+      // X = -x + 2cx
+      // Y = -y + 2cy
+      // (x, y) (cx, cy)
+      let cx = this.config.normalized.centerMark.left;
+      let cy = this.config.normalized.centerMark.top;
+
+      for (let p of this.players) {
+          if (p.y < this.config.normalized.bench.top) {
+              p.x = 2*cx - p.x;
+              p.y = 2*cy - p.y;
+          }
+      }
     }
   },
   created() {
@@ -452,6 +471,10 @@ export default {
         `rgba(${home.join(',')}, 0.8)`,
         `rgba(${away.join(',')}, 0.8)`,
       ]
+    },
+    isChangeEnds: function() {
+      this.changeEnds()
+      this.screenResize()
     }
   }
 }
