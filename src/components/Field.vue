@@ -488,8 +488,6 @@ export default {
   align-items: center;
 }
 svg{
-  font-family: "Yu Gothic", "YuGothic", Arial, sans-serif;
-  font-size: 10pt;
   color: #444;
   user-select: none;
   touch-action: none;

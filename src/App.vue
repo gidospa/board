@@ -1,5 +1,6 @@
 <template>
 <div id="app">
+  <Files></Files>
   <Member
     :members="members"
     :colors="colors"
@@ -20,12 +21,14 @@
 <script>
 import Field from './components/Field.vue'
 import Member from './components/Member.vue'
+import Files from './components/Files.vue'
 
 export default {
   name: 'App',
   components: {
     Field,
-    Member
+    Member,
+    Files
   },
   data() {
     return {
@@ -70,20 +73,9 @@ export default {
 </script>
 
 <style>
-* {
-  font-family: "Yu Gothic", "YuGothic", Arial, sans-serif;
-  color: #444;
-}
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-}
-button {
-  padding: 0.3rem 0.5rem;
-  border-radius: 0.25rem;
-  border: 1px solid #888;
-  background-color: white;
-  text-decoration: none;
 }
 </style>
