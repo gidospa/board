@@ -121,7 +121,8 @@ export default {
   props: {
     members: String,
     colors: String,
-    isChangeEnds: Boolean
+    isChangeEnds: Boolean,
+    capture: Boolean
   },
   data() {
     return {
@@ -475,6 +476,10 @@ export default {
     isChangeEnds: function() {
       this.changeEnds()
       this.screenResize()
+    },
+    capture: function() {
+      console.log('do capture')
+      this.$emit("doneCapture", {message: 'capture field image'})
     }
   }
 }

@@ -1,0 +1,102 @@
+<template>
+<div id="storage">
+  <div class="icon" id="append-mark" @click="onClickAppend()">+</div>
+  <div class="icon" id="open-new-field">New</div>
+  <div id="saved-field-icon"></div>
+</div>
+</template>
+
+<script>
+export default {
+  props: {
+    capture: Object
+  },
+  data() {
+    return {
+      title: 'hello',
+    }
+  },
+  methods: {
+    onClickAppend() {
+      console.log('append')
+      this.$emit("captureField")
+    }
+  },
+  watch: {
+    capture: function() {
+      console.log('got field image')
+    }
+  }
+}
+</script>
+
+<style>
+#storage {
+  display: flex;
+  justify-content: start;
+  margin: 20px 10px 30px;
+  padding: 0rem 1rem;
+  text-align: left;
+}
+.icon {
+    display: inline-block;
+    margin: 0 5px;
+    border-radius: 0.25rem;
+    width: 64px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    background: #fff;
+}
+
+#saved-field-icon {
+    text-align: left;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+}
+#saved-field-icon::-webkit-scrollbar {
+    height: 3px;
+}
+#saved-field-icon::-webkit-scrollbar-track {
+    background: transparent;
+    border: none;
+}
+#saved-field-icon::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+
+#saved-field-icon img {
+    vertical-align: bottom;
+    margin-bottom: 2px;
+    height: 50px;
+    border: 1px solid #888;
+}
+#saved-field-icon img:hover {
+    border: 1px solid #222;
+}
+
+#append-mark {
+    font-size: 28px;
+    padding: 0px 1px;
+    background: none;
+}
+#append-mark:hover,
+#append-mark:focus {
+    color: #222;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#open-new-field {
+    border: 1px solid #888;
+}
+#open-new-field:hover,
+#open-new-field:focus {
+    border-color: #222;    
+}
+</style>

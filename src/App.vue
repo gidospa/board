@@ -1,6 +1,7 @@
 <template>
 <div id="app">
   <Files></Files>
+  <Storage :capture="capture" @captureField="captureField"></Storage>
   <Member
     :members="members"
     :colors="colors"
@@ -12,8 +13,10 @@
     :members="members"
     :colors="colors"
     :isChangeEnds="isChangeEnds"
+    :capture="doCapture"
     @changePlayerInfo="changePlayerInfo" 
-    @changeTeamColors="changeTeamColors">
+    @changeTeamColors="changeTeamColors"
+    @doneCapture="doneCapture">
   </Field>
 </div>
 </template>
@@ -34,7 +37,9 @@ export default {
     return {
       members: '',
       colors: '',
-      isChangeEnds: false
+      isChangeEnds: false,
+      doCapture: false,
+      capture: {},
     }
   },
   methods: {
@@ -67,7 +72,16 @@ export default {
     },
     changeEnds() {
       this.isChangeEnds = this.isChangeEnds ? false : true
-    }
+    },
+    captureField() {
+      console.log('captured filed')
+      this.doCapture = this.doCapture ? false : true
+      console.log(this.doCapture)
+    },
+    doneCapture(image) {
+      this.capture = image
+      console.log(this.capture)
+    },
   }
 }
 </script>
