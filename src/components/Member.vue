@@ -105,8 +105,6 @@ export default {
   padding-bottom: 2vh;
 }
 textarea {
-  font-size: 10pt;
-  color: #444;
   resize: none;
   width: 160px;
   max-height: 1024px;

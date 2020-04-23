@@ -12,7 +12,7 @@
         @mousedown="mouseDown($event, player.team, player.id)"
         @touchstart="touchStart($event, player.team, player.id)"
         @touchmove="touchMove">
-      <text class="player name" x=0 :y="playerSize*1.1" :font-size="fontSize*0.7">{{ player.name }}</text>
+      <text class="player name" x=0 :y="playerSize*1.2" :font-size="fontSize*0.7">{{ player.name }}</text>
       <circle class="player shadow" :cx="playerSize/10" :cy="playerSize/10" :r="playerSize"></circle>
       <circle class="player body" cx=0 cy=0 :r="playerSize" stroke="#333" stroke-width="2" :fill="teamColor[player.team]"></circle>
       <text class="player number" x=0 y=0 :font-size="fontSize">{{ player.number }}</text>
@@ -116,6 +116,7 @@ function Config() {
 }
 
 import Players from '../utils/players.js'
+import Capture from '../utils/capture.js'
   
 export default {
   props: {
@@ -130,9 +131,7 @@ export default {
       screenWidth: 800,
       screenHeight: 600,
       playerSize: 30,
-      maxPlayers: 11,
-      maxTeams: 2,
-      fontSize: 20,
+      fontSize: 30,
       fontColor: `${this.color}`,
       players: [],
       visibility: [[],[]],
@@ -478,8 +477,18 @@ export default {
       this.screenResize()
     },
     capture: function() {
-      console.log('do capture')
-      this.$emit("doneCapture", {message: 'capture field image'})
+      Capture.capture({
+          players: this.players,
+          color: this.teamColor,
+        }, 
+        this.screenWidth,
+        this.isLandscape,
+        this.noBench,
+        this.config,
+        (url) => {
+          this.$emit("doneCapture", url)
+        }
+      )
     }
   }
 }

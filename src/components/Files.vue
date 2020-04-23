@@ -7,10 +7,10 @@
     Export
   </div>
   <div class="file-io-button">
-    capture
+    Capture
   </div>
-  <span>&nbsp;</span><!--
-  --><div class="file-io-button">
+  <span class="blank">&nbsp;</span>
+  <div class="file-io-button">
     Dropbox
   </div>
   <div class="file-io-button">
@@ -25,7 +25,7 @@
 <script>
 </script>
 
-<style>
+<style scoped>
 #files {
   margin: 30px 10px 20px;
   padding: 0px 16px 0px;
@@ -57,5 +57,8 @@
     cursor: default;
     float: right;
     color: #222;
+}
+.blank {
+  padding: 0 0.5rem;
 }
 </style>

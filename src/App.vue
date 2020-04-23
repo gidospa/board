@@ -25,13 +25,15 @@
 import Field from './components/Field.vue'
 import Member from './components/Member.vue'
 import Files from './components/Files.vue'
+import Storage from './components/Storage.vue'
 
 export default {
   name: 'App',
   components: {
     Field,
     Member,
-    Files
+    Files,
+    Storage
   },
   data() {
     return {
@@ -39,7 +41,7 @@ export default {
       colors: '',
       isChangeEnds: false,
       doCapture: false,
-      capture: {},
+      capture: '',
     }
   },
   methods: {
@@ -78,8 +80,8 @@ export default {
       this.doCapture = this.doCapture ? false : true
       console.log(this.doCapture)
     },
-    doneCapture(image) {
-      this.capture = image
+    doneCapture(svgString) {
+      this.capture = svgString
       console.log(this.capture)
     },
   }

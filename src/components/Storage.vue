@@ -9,7 +9,7 @@
 <script>
 export default {
   props: {
-    capture: Object
+    capture: String
   },
   data() {
     return {
@@ -25,6 +25,7 @@ export default {
   watch: {
     capture: function() {
       console.log('got field image')
+      console.log(this.capture)
     }
   }
 }
@@ -33,7 +34,7 @@ export default {
 <style>
 #storage {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   margin: 20px 10px 30px;
   padding: 0rem 1rem;
   text-align: left;
