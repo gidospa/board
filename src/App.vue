@@ -41,7 +41,7 @@ export default {
       colors: '',
       isChangeEnds: false,
       doCapture: false,
-      capture: '',
+      capture: {},
     }
   },
   methods: {
@@ -80,9 +80,8 @@ export default {
       this.doCapture = this.doCapture ? false : true
       console.log(this.doCapture)
     },
-    doneCapture(svgString) {
-      this.capture = svgString
-      console.log(this.capture)
+    doneCapture(capture) {
+      this.capture = capture
     },
   }
 }

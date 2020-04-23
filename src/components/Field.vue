@@ -24,8 +24,10 @@
 <script>
 function Config() {
   // localStorage
-  this.LAST_FIELD_DATA = 'lastField'
-  this.VERSION = '0.9.4'
+  this.LAST_FIELD_DATA = 'lastField';
+  this.VERSION = '0.9.4';
+
+  this.PREVIEW_IMAGE_WIDTH = 256;
   
   // field size [m]
   this.real = {
@@ -481,12 +483,18 @@ export default {
           players: this.players,
           color: this.teamColor,
         }, 
-        this.screenWidth,
-        this.isLandscape,
-        this.noBench,
+        this.config.PREVIEW_IMAGE_WIDTH,
         this.config,
         (url) => {
-          this.$emit("doneCapture", url)
+          let now = new Date()
+          this.$emit("doneCapture",
+            {
+              players: this.players,
+              color: this.teamColor,
+              icon: url,
+              timestamp: now.toLocaleString()
+            },
+          )
         }
       )
     }

@@ -9,7 +9,7 @@
 <script>
 export default {
   props: {
-    capture: String
+    capture: Object
   },
   data() {
     return {

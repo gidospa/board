@@ -1,6 +1,6 @@
 const fieldImage = require('../assets/field.jpg');
 
-function capture(teams, w, isLandscape, noBench, config, onLoad) {
+function capture(teams, w, config, onLoad, isLandscape=true, noBench=false) {
     // load background
     let image = new Image();
     image.onload = () => {
