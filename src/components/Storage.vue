@@ -2,11 +2,15 @@
 <div id="storage">
   <div class="icon" id="append-mark" @click="onClickAppend()">+</div>
   <div class="icon" id="open-new-field">New</div>
-  <div id="saved-field-icon"></div>
+  <div id="saved-field-icon">
+    <img class="icon" v-for="field in fieldStorage" :key="field.timestamp" :src="field.icon" @click="onClickSavedField(field)"/>
+  </div>
 </div>
 </template>
 
 <script>
+const FIELD_DATA_LIST = 'fieldStorage'
+  
 export default {
   props: {
     capture: Object
@@ -14,18 +18,22 @@ export default {
   data() {
     return {
       title: 'hello',
+      fieldStorage: [],
     }
   },
   methods: {
     onClickAppend() {
       console.log('append')
       this.$emit("captureField")
+    },
+    onClickSavedField(field) {
+      console.log("click field icon", field)
     }
   },
   watch: {
     capture: function() {
-      console.log('got field image')
-      console.log(this.capture)
+      console.log(FIELD_DATA_LIST)
+      this.fieldStorage.unshift(this.capture)
     }
   }
 }
