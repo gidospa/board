@@ -3,15 +3,12 @@
   <svg id="field" :width="screenWidth" :height="screenHeight">
     <image href="../assets/field.jpg" :transform="fieldRotate" x="0" y="0" :width="fieldWidth" :height="fieldHeight" 
       @mousedown="fieldMouseDown"
-      @mousemove="fieldMouseMove"
-      @touchstart="fieldTouchStart"
-      @touchmove="fieldTouchMove" />
+      @touchstart="fieldTouchStart" />
     <g v-for="player in players" :key="player.team + ':' + player.id"
         :transform="`translate(${player.cx},${player.cy})`"
         :visibility="visibility[player.team][player.id]"
         @mousedown="mouseDown($event, player.team, player.id)"
-        @touchstart="touchStart($event, player.team, player.id)"
-        @touchmove="touchMove">
+        @touchstart="touchStart($event, player.team, player.id)">
       <text class="player name" x=0 :y="playerSize*1.2" :font-size="fontSize*0.7">{{ player.name }}</text>
       <circle class="player shadow" :cx="playerSize/10" :cy="playerSize/10" :r="playerSize"></circle>
       <circle class="player body" cx=0 cy=0 :r="playerSize" stroke="#333" stroke-width="2" :fill="teamColor[player.team]"></circle>
@@ -178,8 +175,8 @@ export default {
       this.isClick = true
     },
     touchStart(e, team, player) {
-      e.preventDefault()
       console.log(e.type)
+      e.preventDefault()
       let pos = this.getTouchPosition(e)
       this.touchPlayer(team, player, pos)
       this.isClick = true
@@ -202,13 +199,20 @@ export default {
       this.startOffset.y -= this.selectedPlayer.cy
     },
     mouseMove(e) {
+      if (this.selectedPlayer) {
+        console.log('mouseMove', e.type)
+        this.movePlayer(this.getCursorPosition(e))
+      }
       this.isClick = false
-      this.movePlayer(this.getCursorPosition(e))
+      this.fieldClick = false
     },
     touchMove(e) {
-      e.preventDefault()
+      if (this.selectedPlayer) {
+        console.log('touchMove', e.type)
+        this.movePlayer(this.getTouchPosition(e))
+      }
       this.isClick = false
-      this.movePlayer(this.getTouchPosition(e))
+      this.fieldClick = false
     },
     movePlayer(pos) {
       if (!this.selectedPlayer) return
@@ -252,12 +256,18 @@ export default {
       }
       this.fieldClick = null
     },
-    mouseUp() {
-      this.click()
+    mouseUp(e) {
+      if (this.selectedPlayer || this.fieldClick) {
+        console.log('mouseUp', e)
+        this.click()
+      }
     },
     touchEnd(e) {
-      e.preventDefault()
-      this.click()
+      console.log('touchEnd', e)
+      if (this.selectedPlayer || this.fieldClick) {
+        e.preventDefault()
+        this.click()
+      }
     },
     inputPlayerName() {
       console.log('click: ', this.selectedPlayer)
@@ -280,20 +290,14 @@ export default {
       }
     },
     fieldMouseDown(e) {
-      console.log(e.type)
+      console.log('field mouse:', e.type)
       this.fieldClick = this.getCursorPosition(e)
       console.log('field:', this.fieldClick)
     },
-    fieldMouseMove() {
-      this.fieldClick = false
-    },
     fieldTouchStart(e) {
-      console.log(e.type)
+      console.log('field touch:', e.type)
       this.fieldClick = this.getTouchPosition(e)
       console.log('field:', this.fieldClick)
-    },
-    fieldTouchMove() {
-      this.fieldClick = false
     },
     screenResize() {
       let width = document.body.clientWidth*0.99
@@ -429,6 +433,7 @@ export default {
     document.addEventListener('mouseup', this.mouseUp)
     document.addEventListener('touchend', this.touchEnd)
     document.addEventListener('mousemove', this.mouseMove)
+    document.addEventListener('touchmove', this.touchMove)
     window.addEventListener('resize', this.screenResize)
     this.screenResize()
   },
