@@ -103,6 +103,7 @@ export default {
 
 #open-new-field {
     border: 1px solid #888;
+    margin-bottom: 2px;
 }
 #open-new-field:hover,
 #open-new-field:focus {

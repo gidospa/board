@@ -256,16 +256,9 @@ export default {
       }
       this.fieldClick = null
     },
-    mouseUp(e) {
+    mouseUp() {
       if (this.selectedPlayer || this.fieldClick) {
-        console.log('mouseUp', e)
-        this.click()
-      }
-    },
-    touchEnd(e) {
-      console.log('touchEnd', e)
-      if (this.selectedPlayer || this.fieldClick) {
-        e.preventDefault()
+        console.log('mouseUp')
         this.click()
       }
     },
@@ -292,12 +285,10 @@ export default {
     fieldMouseDown(e) {
       console.log('field mouse:', e.type)
       this.fieldClick = this.getCursorPosition(e)
-      console.log('field:', this.fieldClick)
     },
     fieldTouchStart(e) {
       console.log('field touch:', e.type)
       this.fieldClick = this.getTouchPosition(e)
-      console.log('field:', this.fieldClick)
     },
     screenResize() {
       let width = document.body.clientWidth*0.99
@@ -431,7 +422,7 @@ export default {
   },
   mounted() {
     document.addEventListener('mouseup', this.mouseUp)
-    document.addEventListener('touchend', this.touchEnd)
+    document.addEventListener('touchend', this.mouseUp)
     document.addEventListener('mousemove', this.mouseMove)
     document.addEventListener('touchmove', this.touchMove)
     window.addEventListener('resize', this.screenResize)
