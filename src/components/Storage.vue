@@ -9,11 +9,9 @@
 </template>
 
 <script>
-const FIELD_DATA_LIST = 'fieldStorage'
-  
 export default {
   props: {
-    capture: Object
+    storage: Array
   },
   data() {
     return {
@@ -31,9 +29,8 @@ export default {
     }
   },
   watch: {
-    capture: function() {
-      console.log(FIELD_DATA_LIST)
-      this.fieldStorage.unshift(this.capture)
+    storage: function() {
+      this.fieldStorage = this.storage
     }
   }
 }

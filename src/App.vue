@@ -1,7 +1,7 @@
 <template>
 <div id="app">
   <Files></Files>
-  <Storage :capture="capture" @captureField="captureField"></Storage>
+  <Storage :storage="storage" @captureField="captureField"></Storage>
   <Member
     :members="members"
     :colors="colors"
@@ -41,7 +41,7 @@ export default {
       colors: '',
       isChangeEnds: false,
       doCapture: false,
-      capture: {},
+      storage: [],
     }
   },
   methods: {
@@ -81,7 +81,7 @@ export default {
       console.log(this.doCapture)
     },
     doneCapture(capture) {
-      this.capture = capture
+      this.storage.unshift(capture)
     },
   }
 }
