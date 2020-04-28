@@ -7,7 +7,7 @@
     <textarea v-model="home" @blur="onBlur()" spellcheck="false"/>
   </div>
   <div class="member">
-    <button type="button" onfocus="this.blur()" id="changing-ends" @click="onClickChange">Changing ends</button>
+    <button class="default-button" type="button" onfocus="this.blur()" id="changing-ends" @click="onClickChange">Changing ends</button>
   </div>
   <div class="member">
     <textarea v-model="away" @blur="onBlur()" spellcheck="false"/>
@@ -105,6 +105,7 @@ export default {
   padding-bottom: 2vh;
 }
 textarea {
+  font-family: "Yu Gothic", "YuGothic", Arial, sans-serif;
   resize: none;
   width: 160px;
   max-height: 1024px;

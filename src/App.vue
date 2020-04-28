@@ -1,7 +1,7 @@
 <template>
 <div id="app">
   <Files></Files>
-  <Storage :storage="storage" @captureField="captureField"></Storage>
+  <Storage :storage="storage" @captureField="captureField" @clickIcon="onClickIcon"></Storage>
   <Member
     :members="members"
     :colors="colors"
@@ -18,6 +18,8 @@
     @changeTeamColors="changeTeamColors"
     @doneCapture="doneCapture">
   </Field>
+  <Modal v-if="showModal" @close="closeModal" :type="modalType" :field="modalParam"></Modal>
+  <button @click="showModal = true">show Modal</button>
 </div>
 </template>
 
@@ -26,6 +28,7 @@ import Field from './components/Field.vue'
 import Member from './components/Member.vue'
 import Files from './components/Files.vue'
 import Storage from './components/Storage.vue'
+import Modal from './components/Modal.vue'
 
 export default {
   name: 'App',
@@ -33,7 +36,8 @@ export default {
     Field,
     Member,
     Files,
-    Storage
+    Storage,
+    Modal
   },
   data() {
     return {
@@ -42,6 +46,9 @@ export default {
       isChangeEnds: false,
       doCapture: false,
       storage: [],
+      showModal: false,
+      modalType: 'delete-field',
+      modalParam: {}
     }
   },
   methods: {
@@ -73,16 +80,31 @@ export default {
       this.members = strMembers
     },
     changeEnds() {
-      this.isChangeEnds = this.isChangeEnds ? false : true
+      this.isChangeEnds = !this.isChangeEnds
     },
     captureField() {
       console.log('captured filed')
-      this.doCapture = this.doCapture ? false : true
+      this.doCapture = !this.doCapture
       console.log(this.doCapture)
     },
     doneCapture(capture) {
       this.storage.unshift(capture)
     },
+    closeModal(state) {
+      this.showModal = false
+      console.log(state)
+      if (this.modalType === 'delete-field') {
+        if (state.type === 'delete') {
+          this.storage.splice(state.index, 1)
+        }
+      }
+    },
+    onClickIcon(index) {
+      console.log(index)
+      this.modalType = 'delete-field'
+      this.modalParam = {index, icon:this.storage[index].icon, timestamp:this.storage[index].timestamp}
+      this.showModal = true
+    }
   }
 }
 </script>

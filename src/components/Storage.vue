@@ -3,7 +3,7 @@
   <div class="icon" id="append-mark" @click="onClickAppend()">+</div>
   <div class="icon" id="open-new-field">New</div>
   <div id="saved-field-icon">
-    <img class="icon" v-for="field in fieldStorage" :key="field.timestamp" :src="field.icon" @click="onClickSavedField(field)"/>
+    <img class="icon" v-for="(field, index) in fieldStorage" :key="field.timestamp+index" :src="field.icon" @click="onClickIcon(index)"/>
   </div>
 </div>
 </template>
@@ -15,7 +15,6 @@ export default {
   },
   data() {
     return {
-      title: 'hello',
       fieldStorage: [],
     }
   },
@@ -24,8 +23,9 @@ export default {
       console.log('append')
       this.$emit("captureField")
     },
-    onClickSavedField(field) {
-      console.log("click field icon", field)
+    onClickIcon(index) {
+      console.log("click icon", index)
+      this.$emit("clickIcon", index)
     }
   },
   watch: {
