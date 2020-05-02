@@ -1,109 +1,64 @@
 <template>
 <div id="storage">
-  <div class="icon" id="append-mark" @click="onClickAppend()">+</div>
-  <div class="icon" id="open-new-field">New</div>
-  <div id="saved-field-icon">
-    <img class="icon" v-for="(field, index) in fieldStorage" :key="field.timestamp+index" :src="field.icon" @click="onClickIcon(index)"/>
+  <div class="storage-button">
+    <label>Import</label>
+  </div>
+  <div class="storage-button">
+    Export
+  </div>
+  <div class="storage-button">
+    Capture
+  </div>
+  <span class="blank">&nbsp;</span>
+  <div class="storage-button">
+    Dropbox
+  </div>
+  <div class="storage-button">
+    Google
+  </div>
+  <div class="storage-button" id="clear-local-storage">
+    Clear
   </div>
 </div>
 </template>
 
 <script>
-export default {
-  props: {
-    storage: Array
-  },
-  data() {
-    return {
-      fieldStorage: [],
-    }
-  },
-  methods: {
-    onClickAppend() {
-      console.log('append')
-      this.$emit("captureField")
-    },
-    onClickIcon(index) {
-      console.log("click icon", index)
-      this.$emit("clickIcon", index)
-    }
-  },
-  watch: {
-    storage: function() {
-      this.fieldStorage = this.storage
-    }
-  }
-}
 </script>
 
-<style>
+<style scoped>
 #storage {
-  display: flex;
-  justify-content: flex-start;
-  margin: 20px 10px 30px;
-  padding: 0rem 1rem;
+  margin: 30px 10px 20px;
+  padding: 0px 16px 0px;
   text-align: left;
+  user-select: none;
+  touch-action: none;
 }
-.icon {
+.storage-button {
+    cursor: default;
     display: inline-block;
     margin: 0 5px;
+    border: 1px solid #888;
     border-radius: 0.25rem;
-    width: 64px;
-    height: 50px;
-    line-height: 50px;
     text-align: center;
-    -moz-user-select: none;
-    -webkit-user-select: none;
+    line-height: 24px;
+    width: 64px;
+    vertical-align: top;
     background: #fff;
+    font-size: 0.9rem;
 }
-
-#saved-field-icon {
-    text-align: left;
-    display: flex;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    flex: 1;
+.storage-button:hover {
+    border-color: #222;
 }
-#saved-field-icon::-webkit-scrollbar {
-    height: 3px;
+#clear-local-storage {
+    float: right;
 }
-#saved-field-icon::-webkit-scrollbar-track {
-    background: transparent;
-    border: none;
-}
-#saved-field-icon::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 10px;
-}
-
-#saved-field-icon img {
-    vertical-align: bottom;
-    margin-bottom: 2px;
-    height: 50px;
-    border: 1px solid #888;
-}
-#saved-field-icon img:hover {
-    border: 1px solid #222;
-}
-
-#append-mark {
-    font-size: 28px;
-    padding: 0px 1px;
-    background: none;
-}
-#append-mark:hover,
-#append-mark:focus {
+#clear-local-storage:hover,
+#clear-local-storage:focus {
+    cursor: default;
+    float: right;
     color: #222;
-    text-decoration: none;
-    font-weight: bold;
 }
-
-#open-new-field {
-    border: 1px solid #888;
-    margin-bottom: 2px;
-}
-#open-new-field:hover,
-#open-new-field:focus {
-    border-color: #222;    
+.blank {
+  padding: 0 0.5rem;
 }
 </style>

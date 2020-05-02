@@ -1,7 +1,7 @@
 <template>
 <div id="app">
-  <Files></Files>
-  <Storage :storage="storage" @captureField="captureField" @clickIcon="onClickIcon"></Storage>
+  <Storage :storage="storage" @changeStorage="changeStorage"></Storage>
+  <Files :storage="storage" @captureField="captureField" @clickIcon="onClickIcon"></Files>
   <Member
     :members="members"
     :colors="colors"
@@ -19,7 +19,6 @@
     @doneCapture="doneCapture">
   </Field>
   <Modal v-if="showModal" @close="closeModal" :type="modalType" :field="modalParam"></Modal>
-  <button @click="showModal = true">show Modal</button>
 </div>
 </template>
 
@@ -104,6 +103,9 @@ export default {
       this.modalType = 'delete-field'
       this.modalParam = {index, icon:this.storage[index].icon, timestamp:this.storage[index].timestamp}
       this.showModal = true
+    },
+    changeStorage() {
+      console.log('changeStorage')
     }
   }
 }
