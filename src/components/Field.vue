@@ -25,6 +25,7 @@ function Config() {
   this.VERSION = '0.9.4';
 
   this.PREVIEW_IMAGE_WIDTH = 256;
+  this.CAPTURE_IMAGE_WIDTH = 1920;
   
   // field size [m]
   this.real = {
@@ -122,7 +123,8 @@ export default {
     members: String,
     colors: String,
     isChangeEnds: Boolean,
-    capture: Boolean
+    save: Boolean,
+    capture: Boolean,
   },
   data() {
     return {
@@ -474,16 +476,17 @@ export default {
       this.changeEnds()
       this.screenResize()
     },
-    capture: function() {
+    save: function() {
       Capture.capture({
+        teams: {
           players: this.players,
           color: this.teamColor,
         }, 
-        this.config.PREVIEW_IMAGE_WIDTH,
-        this.config,
-        (url) => {
+        w: this.config.PREVIEW_IMAGE_WIDTH,
+        config: this.config,
+        onLoad: (url) => {
           let now = new Date()
-          this.$emit("doneCapture",
+          this.$emit("doneSave",
             {
               players: this.players,
               color: this.teamColor,
@@ -491,8 +494,25 @@ export default {
               timestamp: now.toLocaleString()
             },
           )
-        }
-      )
+        },
+        isLandscape: true,
+        noBench: false
+      })
+    },
+    capture: function() {
+      Capture.capture({
+        teams: {
+          players: this.players,
+          color: this.teamColor,
+        },
+        w: this.config.CAPTURE_IMAGE_WIDTH,
+        config: this.config,
+        onLoad: (url) => {
+          this.$emit("doneCapture", url)
+        },
+        isLandscape: this.isLandscape,
+        noBench: this.noBench
+      })
     }
   }
 }

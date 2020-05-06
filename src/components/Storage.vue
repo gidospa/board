@@ -6,7 +6,7 @@
   <div class="storage-button">
     Export
   </div>
-  <div class="storage-button">
+  <div class="storage-button" @click="$emit('captureField')">
     Capture
   </div>
   <span class="blank">&nbsp;</span>
@@ -23,6 +23,36 @@
 </template>
 
 <script>
+export default {
+  props: {
+    capture: Object
+  },
+  watch: {
+    capture: function() {
+      console.log(this.capture)
+
+      // filename
+      let now = new Date()
+      let datetime = now.getFullYear()
+      datetime += ('0' + (now.getMonth()+1)).slice(-2)
+      datetime += ('0' + now.getDate()).slice(-2)
+      datetime += '-'
+      datetime += ('0' + now.getHours()).slice(-2)
+      datetime += ('0' + now.getMinutes()).slice(-2)
+      datetime += ('0' + now.getSeconds()).slice(-2)
+      let filename = 'tucana' + datetime + '.png'
+      console.log(filename)
+
+      // download capture image
+      let a = document.createElement('a')
+      a.download = filename
+      a.href = this.capture.image
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    }
+  }
+}
 </script>
 
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
 <div id="app">
-  <Storage :storage="storage" @changeStorage="changeStorage"></Storage>
-  <Files :storage="storage" @captureField="captureField" @clickIcon="onClickIcon"></Files>
+  <Storage :capture="capture" @changeStorage="changeStorage" @captureField="captureField"></Storage>
+  <Files :storage="storage" @saveField="saveField" @clickIcon="onClickIcon"></Files>
   <Member
     :members="members"
     :colors="colors"
@@ -13,9 +13,11 @@
     :members="members"
     :colors="colors"
     :isChangeEnds="isChangeEnds"
+    :save="doSave"
     :capture="doCapture"
     @changePlayerInfo="changePlayerInfo" 
     @changeTeamColors="changeTeamColors"
+    @doneSave="doneSave"
     @doneCapture="doneCapture">
   </Field>
   <Modal v-if="showModal" @close="closeModal" :type="modalType" :field="modalParam"></Modal>
@@ -44,10 +46,12 @@ export default {
       colors: '',
       isChangeEnds: false,
       doCapture: false,
+      doSave: false,
       storage: [],
       showModal: false,
       modalType: 'delete-field',
-      modalParam: {}
+      modalParam: {},
+      capture: {image: ''}
     }
   },
   methods: {
@@ -81,13 +85,12 @@ export default {
     changeEnds() {
       this.isChangeEnds = !this.isChangeEnds
     },
-    captureField() {
-      console.log('captured filed')
-      this.doCapture = !this.doCapture
-      console.log(this.doCapture)
+    saveField() {
+      console.log('saved filed')
+      this.doSave = !this.doSave
     },
-    doneCapture(capture) {
-      this.storage.unshift(capture)
+    doneSave(field) {
+      this.storage.unshift(field)
     },
     closeModal(state) {
       this.showModal = false
@@ -106,6 +109,13 @@ export default {
     },
     changeStorage() {
       console.log('changeStorage')
+    },
+    captureField() {
+      console.log('captured field')
+      this.doCapture = !this.doCapture
+    },
+    doneCapture(image) {
+      this.capture = {image}
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
 <div id="files">
-  <div class="icon" id="append-mark" @click="onClickAppend()">+</div>
+  <div class="icon" id="append-mark" @click="$emit('saveField')">+</div>
   <div class="icon" id="open-new-field">New</div>
   <div id="saved-field-icon">
     <img class="icon" v-for="(field, index) in fieldStorage" :key="field.timestamp+index" :src="field.icon" @click="onClickIcon(index)"/>
@@ -21,7 +21,6 @@ export default {
   methods: {
     onClickAppend() {
       console.log('append')
-      this.$emit("captureField")
     },
     onClickIcon(index) {
       console.log("click icon", index)
