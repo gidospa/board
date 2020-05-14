@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import {CAPTURE_FILE_PREFIX} from '../utils/config.js'
+
 export default {
   props: {
     capture: Object
@@ -40,7 +42,7 @@ export default {
       datetime += ('0' + now.getHours()).slice(-2)
       datetime += ('0' + now.getMinutes()).slice(-2)
       datetime += ('0' + now.getSeconds()).slice(-2)
-      let filename = 'tucana' + datetime + '.png'
+      let filename = CAPTURE_FILE_PREFIX + datetime + '.png'
       console.log(filename)
 
       // download capture image

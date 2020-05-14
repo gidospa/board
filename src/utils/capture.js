@@ -1,6 +1,8 @@
+import * as Config from './config.js'
+
 const fieldImage = require('../assets/field.jpg');
 
-function capture({teams, w, config, onLoad, isLandscape=true, noBench=false}={}) {
+function capture({teams, w, onLoad, isLandscape=true, noBench=false}={}) {
     // load background
     let image = new Image();
     image.onload = () => {
@@ -13,37 +15,37 @@ function capture({teams, w, config, onLoad, isLandscape=true, noBench=false}={})
         let height = null;
         if (isLandscape) {
             canvas.width = w;
-            canvas.height = w/config.png.aspect[noBench];
+            canvas.height = w/Config.PNG.ASPECT[noBench];
             width = w;
-            height = w/config.png.aspect[noBench];
+            height = w/Config.PNG.ASPECT[noBench];
             context.drawImage(
                 image,
-                0, 0, config.png.size[noBench].w, config.png.size[noBench].h,
+                0, 0, Config.PNG.SIZE[noBench].w, Config.PNG.SIZE[noBench].h,
                 0, 0, width, height
             );
         }
         else {
             canvas.width = w;
-            canvas.height = config.png.aspect[noBench]*w;
-            width = config.png.aspect[noBench]*w;
+            canvas.height = Config.PNG.ASPECT[noBench]*w;
+            width = Config.PNG.ASPECT[noBench]*w;
             height = w;
             context.save();
             context.rotate(-90*Math.PI/180);
             context.translate(-width,0);
             context.drawImage(
                 image,
-                0, 0, config.png.size[noBench].w, config.png.size[noBench].h,
+                0, 0, Config.PNG.SIZE[noBench].w, Config.PNG.SIZE[noBench].h,
                 0, 0, width, height
             );
             context.restore();
         }
 
-        let playerSize = config.normalized.player_size*width;
-        let fontSize = config.normalized.font_size*width;
+        let playerSize = Config.NORMALIZED.PLAYER_SIZE*width;
+        let fontSize = Config.NORMALIZED.FONT_SIZE*width;
 
         // draw player
         for (let p of teams.players) {
-            if (noBench && p.y > config.normalized.bench.top) continue;
+            if (noBench && p.y > Config.NORMALIZED.BENCH.TOP) continue;
 
             let px = 0;
             let py = 0;

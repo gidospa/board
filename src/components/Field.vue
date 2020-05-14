@@ -19,105 +19,10 @@
 </template>
 
 <script>
-function Config() {
-  // localStorage
-  this.LAST_FIELD_DATA = 'lastField';
-  this.VERSION = '0.9.4';
-
-  this.PREVIEW_IMAGE_WIDTH = 256;
-  this.CAPTURE_IMAGE_WIDTH = 1920;
-  
-  // field size [m]
-  this.real = {
-    TOUCH_LINE: 105,
-    GOAL_LINE: 68,
-    PENALTY_BOX: {h: 40.4, w: 16.5},
-    GOAL_AREA: {h: 18.4, w: 5.5},
-    CENTER_CIRCLE_R: 9.15,
-    GOAL: {w: 7.32, d: 1.6},
-    LINE_WIDTH: 0.12,
-  }
-
-  // player
-  this.NUMBER_OF_PLAYERS = 18;
-  this.NUMBER_OF_TEAMS = 2;
-
-  // field.png size [px]
-  this.png = {
-    WIDTH: 1280,
-    HEIGHT: 960,
-    FONT_SIZE: 28,
-    PLAYER_SIZE: 30
-  }
-  this.png.field = {
-    w: this.png.WIDTH/22*20
-  }
-  this.png.field.h = (this.real.GOAL_LINE/this.real.TOUCH_LINE)*this.png.field.w
-  this.png.margin = {
-    top: 25,
-    bottom: 25,
-    left: this.png.WIDTH/22,
-    right: this.png.WIDTH/22
-  }
-  this.png.bench = {
-    left: 0,
-    top: this.png.margin.top + this.png.field.h + this.png.margin.bottom,
-    w: this.png.WIDTH,
-    h: this.png.HEIGHT - this.png.field.h - this.png.margin.top - this.png.margin.bottom
-  }
-  this.png.centerMark = {
-    left: this.png.width/2,
-    top: this.png.margin.top + this.png.field.h/2
-  }
-  this.png.size = {
-    false: { // with bench
-      w: this.png.WIDTH,
-      h: this.png.HEIGHT
-    },
-    true: { // no bench
-      w: this.png.WIDTH,
-      h: this.png.HEIGHT - this.png.bench.h
-    }
-  }
-  this.png.aspect = {
-    // with bench
-    false: this.png.size[false].w/this.png.size[false].h,
-    // no bench
-    true: this.png.size[true].w/this.png.size[true].h
-  }
-  
-  // normalized field
-  this.normalized = {
-    width: 1.0,
-    height: this.png.HEIGHT/this.png.WIDTH,
-    field: {
-      w: this.png.field.w/this.png.WIDTH,
-      h: this.png.field.h/this.png.WIDTH
-    },
-    font_size: this.png.FONT_SIZE/this.png.WIDTH,
-    player_size: this.png.PLAYER_SIZE/this.png.WIDTH,
-    margin: {
-      top: this.png.margin.top/this.png.WIDTH,
-      bottom: this.png.margin.bottom/this.png.WIDTH,
-      left: this.png.margin.left/this.png.WIDTH,
-      right: this.png.margin.right/this.png.WIDTH
-    }
-  }
-  this.normalized.centerMark = {
-    left: this.normalized.width/2,
-    top:  this.normalized.margin.top + this.normalized.field.h/2,
-  }
-  this.normalized.bench = {
-    left: this.png.bench.left/this.png.WIDTH,
-    top: this.png.bench.top/this.png.WIDTH,
-    w: this.png.bench.w/this.png.WIDTH,
-    h: this.png.bench.h/this.png.WIDTH,
-  }
-}
-
 import Players from '../utils/players.js'
 import Capture from '../utils/capture.js'
-  
+import * as Config from '../utils/config.js'
+
 export default {
   props: {
     members: String,
@@ -128,7 +33,6 @@ export default {
   },
   data() {
     return {
-      config: new Config(),
       screenWidth: 800,
       screenHeight: 600,
       playerSize: 30,
@@ -248,10 +152,11 @@ export default {
       // click filed
       if (this.fieldClick) {
         console.log('field click!!', this.fieldClick)
-        
-        // click bench area
+        console.log(Config)
+
+      // click bench area
         let fieldBottom = this.isLandscape ? this.fieldClick.y : this.fieldClick.x
-        if (fieldBottom > (this.config.normalized.field.h + this.config.normalized.margin.top)*this.fieldWidth) {
+        if (fieldBottom > (Config.NORMALIZED.FIELD.h + Config.NORMALIZED.MARGIN.TOP)*this.fieldWidth) {
           this.noBench = this.noBench ? false : true
           this.screenResize()
         }
@@ -300,31 +205,31 @@ export default {
       if (width > height) {
         console.log('landscape')
         this.isLandscape = true
-        if (width/height < this.config.png.aspect[this.noBench]) {
+        if (width/height < Config.PNG.ASPECT[this.noBench]) {
           this.screenWidth = width
-          this.screenHeight = width/this.config.png.aspect[this.noBench]
+          this.screenHeight = width/Config.PNG.ASPECT[this.noBench]
         }
         else {
-          this.screenWidth = height*this.config.png.aspect[this.noBench]
+          this.screenWidth = height*Config.PNG.ASPECT[this.noBench]
           this.screenHeight = height
         }
       }
       else {
         console.log('portrate')
         this.isLandscape = false
-        if (height/width < this.config.png.aspect[this.noBench]) {
-          this.screenWidth = height/this.config.png.aspect[this.noBench]
+        if (height/width < Config.PNG.ASPECT[this.noBench]) {
+          this.screenWidth = height/Config.PNG.ASPECT[this.noBench]
           this.screenHeight = height
         }
         else {
           this.screenWidth = width
-          this.screenHeight = width*this.config.png.aspect[this.noBench]
+          this.screenHeight = width*Config.PNG.ASPECT[this.noBench]
         }
       }
 
       if (this.isLandscape) {
         for (let player of this.players) {
-          if (this.noBench && player.y > this.config.normalized.bench.top) {
+          if (this.noBench && player.y > Config.NORMALIZED.BENCH.TOP) {
             this.visibility[player.team][player.id] = 'hidden'
           }
           else {
@@ -335,11 +240,11 @@ export default {
         }
         this.fieldRotate = `rotate(0, 0, 0) translate(0,0)`
         this.fieldWidth = this.screenWidth
-        this.fieldHeight = this.fieldWidth/this.config.png.aspect[false] // always with bench
+        this.fieldHeight = this.fieldWidth/Config.PNG.ASPECT[false] // always with bench
       }
       else {
         for (let player of this.players) {
-          if (this.noBench && player.y > this.config.normalized.bench.top) {
+          if (this.noBench && player.y > Config.NORMALIZED.BENCH.TOP) {
             this.visibility[player.team][player.id] = 'hidden'
           }
           else {
@@ -350,11 +255,11 @@ export default {
         }
         this.fieldRotate = `rotate(-90, 0, 0) translate(${-this.screenHeight},0)`
         this.fieldWidth = this.screenHeight
-        this.fieldHeight = this.fieldWidth/this.config.png.aspect[false] // always with bench
+        this.fieldHeight = this.fieldWidth/Config.PNG.ASPECT[false] // always with bench
       }
 
-      this.playerSize = this.config.normalized.player_size*this.fieldWidth
-      this.fontSize = this.config.normalized.font_size*this.fieldWidth
+      this.playerSize = Config.NORMALIZED.PLAYER_SIZE*this.fieldWidth
+      this.fontSize = Config.NORMALIZED.FONT_SIZE*this.fieldWidth
 
       console.log('screen: ', this.screenWidth, this.screenHeight)
       console.log('field: ', this.fieldWidth, this.fieldHeight)
@@ -367,11 +272,11 @@ export default {
       // X = -x + 2cx
       // Y = -y + 2cy
       // (x, y) (cx, cy)
-      let cx = this.config.normalized.centerMark.left;
-      let cy = this.config.normalized.centerMark.top;
+      let cx = Config.NORMALIZED.CENTERMARK.LEFT;
+      let cy = Config.NORMALIZED.CENTERMARK.TOP;
 
       for (let p of this.players) {
-          if (p.y < this.config.normalized.bench.top) {
+          if (p.y < Config.NORMALIZED.BENCH.TOP) {
               p.x = 2*cx - p.x;
               p.y = 2*cy - p.y;
           }
@@ -379,10 +284,10 @@ export default {
     }
   },
   created() {
-    if (localStorage[this.config.LAST_FIELD_DATA]) {
-      let lastFieldData = JSON.parse(localStorage[this.config.LAST_FIELD_DATA])
+    if (localStorage[Config.LAST_FIELD_DATA]) {
+      let lastFieldData = JSON.parse(localStorage[Config.LAST_FIELD_DATA])
       console.log('created: ', lastFieldData)
-      if (lastFieldData.version == this.config.VERSION) {
+      if (lastFieldData.version == Config.VERSION) {
         this.players = lastFieldData.players
         this.teamColor = lastFieldData.color
       }
@@ -393,7 +298,7 @@ export default {
     }
 
     if (this.players.length == 0) {
-      this.players = Players.newPlayers(null, this.config)
+      this.players = Players.newPlayers(null)
       // todo save data format
     }
 
@@ -414,13 +319,10 @@ export default {
     this.$emit('changeTeamColors', teamColor)
 
     this.visibility.forEach((team) => {
-      for (let i = 0; i < this.config.NUMBER_OF_PLAYERS; i++) {
+      for (let i = 0; i < Config.NUMBER_OF_PLAYERS; i++) {
         team.push('visibile')
       }
     })
-    console.log('players: ', this.players)
-    console.log(document.body.clientWidth)
-    console.log(this.config)
   },
   mounted() {
     document.addEventListener('mouseup', this.mouseUp)
@@ -434,8 +336,8 @@ export default {
     players: {
       deep: true,
       handler() {
-        localStorage[this.config.LAST_FIELD_DATA] = JSON.stringify({
-          version: this.config.VERSION,
+        localStorage[Config.LAST_FIELD_DATA] = JSON.stringify({
+          version: Config.VERSION,
           players: this.players,
           color: this.teamColor,
         })
@@ -482,8 +384,7 @@ export default {
           players: this.players,
           color: this.teamColor,
         }, 
-        w: this.config.PREVIEW_IMAGE_WIDTH,
-        config: this.config,
+        w: Config.PREVIEW_IMAGE_WIDTH,
         onLoad: (url) => {
           let now = new Date()
           this.$emit("doneSave",
@@ -505,8 +406,7 @@ export default {
           players: this.players,
           color: this.teamColor,
         },
-        w: this.config.CAPTURE_IMAGE_WIDTH,
-        config: this.config,
+        w: Config.CAPTURE_IMAGE_WIDTH,
         onLoad: (url) => {
           this.$emit("doneCapture", url)
         },
