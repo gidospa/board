@@ -20,6 +20,7 @@
     :isChangeEnds="isChangeEnds"
     :save="doSave"
     :capture="doCapture"
+    :formations="formations"
     @changePlayerInfo="changePlayerInfo" 
     @changeTeamColors="changeTeamColors"
     @doneSave="doneSave"
@@ -56,7 +57,8 @@ export default {
       showModal: false,
       modalType: 'delete-field',
       modalParam: {},
-      capture: {image: ''}
+      capture: {image: ''},
+      formations: []
     }
   },
   methods: {
@@ -99,7 +101,6 @@ export default {
     },
     closeModal(state) {
       this.showModal = false
-      console.log(state)
       if (this.modalType === 'delete-field') {
         if (state.type === 'delete') {
           this.storage.splice(state.index, 1)
@@ -115,10 +116,10 @@ export default {
             }
             else {
               f.unshift('1')
-              formations.push(f)
+              formations.push(f.map(Number))
             }
           }
-          console.log(formations)
+          this.formations = formations
         }
       }
     },

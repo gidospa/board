@@ -58,13 +58,9 @@
         </div>
       </div>
 
-      <div>
-        <img :src="field.icon"/>
-      </div>
-
       <div class="modal-button">
         <div class="center-button">
-          <button class="default-button" @click="clickOk">Ok</button>
+          <button class="default-button" @click="clickOk">OK</button>
         </div>
       </div>
     </div>
@@ -164,12 +160,15 @@ export default {
     width: 45%;
 }
 .formation {
+    display: flex;
     margin: 0.5rem auto;
     border: 1px solid #888;
     border-radius: 0.25rem;
     height: 1.5rem;
     width: 5rem;
     font-size: 1rem;
+    justify-content: center;
+    align-items: center;
 }
 .formation:hover {
     border-color: #222;

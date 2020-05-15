@@ -30,6 +30,7 @@ export default {
     isChangeEnds: Boolean,
     save: Boolean,
     capture: Boolean,
+    formations: Array,
   },
   data() {
     return {
@@ -412,6 +413,12 @@ export default {
         isLandscape: this.isLandscape,
         noBench: this.noBench
       })
+    },
+    formations: function() {
+      console.log('detected formation change')
+      this.players = Players.newPlayers(this.formations)
+      this.screenResize()
+      this.$emit('changePlayerInfo', this.players)
     }
   }
 }
