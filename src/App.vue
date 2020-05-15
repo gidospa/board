@@ -1,7 +1,12 @@
 <template>
 <div id="app">
   <Storage :capture="capture" @changeStorage="changeStorage" @captureField="captureField"></Storage>
-  <Files :storage="storage" @saveField="saveField" @clickIcon="onClickIcon"></Files>
+  <Files
+    :storage="storage"
+    @saveField="saveField"
+    @clickIcon="onClickIcon"
+    @openNewField="openNewField">
+  </Files>
   <Member
     :members="members"
     :colors="colors"
@@ -100,11 +105,36 @@ export default {
           this.storage.splice(state.index, 1)
         }
       }
+      if (this.modalType === 'open-new-field') {
+        if (state.type === 'open') {
+          let formations = []
+          for (const team of ['home', 'away']) {
+            let f = state[team].split('-')
+            if (f[0] === 'none') {
+              formations.push([])
+            }
+            else {
+              f.unshift('1')
+              formations.push(f)
+            }
+          }
+          console.log(formations)
+        }
+      }
     },
     onClickIcon(index) {
       console.log(index)
       this.modalType = 'delete-field'
       this.modalParam = {index, icon:this.storage[index].icon, timestamp:this.storage[index].timestamp}
+      this.showModal = true
+    },
+    openNewField() {
+      console.log("openNewfield")
+      this.modalType = 'open-new-field'
+      
+      let c = this.colors.split(',')
+      this.modalParam = {homeColor:c[0], awayColor:c[1]}
+      
       this.showModal = true
     },
     changeStorage() {

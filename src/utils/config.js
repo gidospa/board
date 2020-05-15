@@ -24,6 +24,15 @@ export const REAL_FIELD_SIZE = {
 export const NUMBER_OF_PLAYERS = 18;
 export const NUMBER_OF_TEAMS = 2;
 
+// default formations
+export const FORMATIONS = [
+  'none',
+  '3-4-3',
+  '4-3-3',
+  '4-4-2',
+  '5-4-1',
+]
+
 // field.png size [px]
 export const PNG = {
   WIDTH: 1280,

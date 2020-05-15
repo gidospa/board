@@ -299,7 +299,6 @@ export default {
 
     if (this.players.length == 0) {
       this.players = Players.newPlayers(null)
-      // todo save data format
     }
 
     this.$emit('changePlayerInfo', this.players)

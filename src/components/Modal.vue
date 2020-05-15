@@ -1,6 +1,7 @@
 <template>
   <div id="modal-dialog">
     <div class="dialog-overlay"></div>
+    
     <div class="modal-container" v-if="type == 'delete-field'">
       <div class="modal-close">
         <div><span @click="$emit('close', {type:'close'})">&times;</span></div>
@@ -22,16 +23,79 @@
           <button class="default-button" @click="$emit('close', {type:'delete', index:field.index})">Delete</button>
         </div>
       </div>
-
     </div>
+
+
+    <div class="modal-container" v-if="type == 'open-new-field'">
+      <div class="modal-close">
+        <div><span @click="$emit('close', {type:'close'})">&times;</span></div>
+      </div>
+
+      <div class="modal-header">
+        FORMATION
+      </div>
+      
+      <div class="select-formation">
+        <div class="formation-list" id="left-team">
+          <div><span :style="{color: field.homeColor}">&#x25CF;&nbsp;</span>HOME</div>
+          <div class="formation"
+               v-for="(formation, index) in formations"
+               :key="'home'+index"
+               :class="{selected: selected.home == index}"
+               @click="clickFormation('home', index)">
+            {{ formation }}
+          </div>
+        </div>
+        <div class="formation-list" id="right-team">
+          <div><span :style="{color: field.awayColor}">&#x25CF;&nbsp;</span>AWAY</div>
+          <div class="formation"
+               v-for="(formation, index) in formations"
+               :key="'away'+index"
+               :class="{selected: selected.away == index}"
+               @click="clickFormation('away', index)">
+            {{ formation }}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <img :src="field.icon"/>
+      </div>
+
+      <div class="modal-button">
+        <div class="center-button">
+          <button class="default-button" @click="clickOk">Ok</button>
+        </div>
+      </div>
+    </div>
+    
+
   </div>
 </template>
 
 <script>
+import {FORMATIONS} from '../utils/config.js'
+
 export default {
   props: {
     type: String,
     field: Object
+  },
+  data() {
+    return {
+      formations: FORMATIONS,
+      selected: {home: 0, away: 0}
+    }
+  },
+  methods: {
+    clickFormation(team, index) {
+      this.selected[team] = index
+    },
+    clickOk() {
+      let home = this.formations[this.selected.home]
+      let away = this.formations[this.selected.away]
+      this.$emit('close', {type: 'open', home, away})
+    }
   }
 }
 </script>
@@ -94,4 +158,26 @@ export default {
     text-decoration: none;
 }
 
+
+.formation-list {
+    display: inline-block;
+    width: 45%;
+}
+.formation {
+    margin: 0.5rem auto;
+    border: 1px solid #888;
+    border-radius: 0.25rem;
+    height: 1.5rem;
+    width: 5rem;
+    font-size: 1rem;
+}
+.formation:hover {
+    border-color: #222;
+}
+.formation.selected {
+    background-color: #eef;
+}
+.select-formation {
+    margin-top: 1em;
+}
 </style>
