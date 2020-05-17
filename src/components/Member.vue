@@ -109,13 +109,14 @@ textarea {
   resize: none;
   width: 160px;
   max-height: 1024px;
-  height: calc( 1.3em * 18 );
-  line-height: 1.3;
+  height: calc( 1.4em * 18 );
+  line-height: 1.4;
   padding: 0;
   vertical-align: bottom;
+  font-size: 1rem;
 }
 #changing-ends {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
 }
 .member {
   display: inline-block;
