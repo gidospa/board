@@ -79,6 +79,15 @@ export default {
       this.$emit('changeEnds')
     }
   },
+  created() {
+    let m = this.members.split('\n\n')
+    this.home = m[0]
+    this.away = m[1]
+
+    let c = this.colors.split(',')
+    this.homeColor = c[0]
+    this.awayColor = c[1]   
+  },
   watch: {
     members: function(newMember) {
       let m = newMember.split('\n\n')

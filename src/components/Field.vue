@@ -19,18 +19,16 @@
 </template>
 
 <script>
-import Players from '../utils/players.js'
 import Capture from '../utils/capture.js'
 import * as Config from '../utils/config.js'
+import {hex2rgba} from '../utils/color.js'
 
 export default {
   props: {
-    members: String,
     colors: String,
-    isChangeEnds: Boolean,
     save: Boolean,
     capture: Boolean,
-    formations: Array,
+    playerInfo: Array,
   },
   data() {
     return {
@@ -123,8 +121,6 @@ export default {
     },
     movePlayer(pos) {
       if (!this.selectedPlayer) return
-      console.log('movePlayer pos:', pos)
-      console.log('movePlayer selectedPlayer:', this.selectedPlayer)
       this.selectedPlayer.cx = pos.x - this.startOffset.x
       this.selectedPlayer.cy = pos.y - this.startOffset.y
       if (this.selectedPlayer.cx < 0) this.selectedPlayer.cx = 0
@@ -153,7 +149,6 @@ export default {
       // click filed
       if (this.fieldClick) {
         console.log('field click!!', this.fieldClick)
-        console.log(Config)
 
       // click bench area
         let fieldBottom = this.isLandscape ? this.fieldClick.y : this.fieldClick.x
@@ -165,6 +160,9 @@ export default {
       this.fieldClick = null
     },
     mouseUp() {
+      if (this.selectedPlayer) {
+        this.$emit('updatePlayerPosition', this.players)
+      }
       if (this.selectedPlayer || this.fieldClick) {
         console.log('mouseUp')
         this.click()
@@ -180,13 +178,12 @@ export default {
       if (prompt) {
         let p = prompt.split(',')
         let number = parseInt(p[0])
+        let name = ''
         if (number) {
-          this.selectedPlayer.number = number
-          this.selectedPlayer.name = ''
           if (p.length > 1) {
-            this.selectedPlayer.name = p[1].trim()
+            name = p[1].trim()
           }
-          this.$emit('changePlayerInfo', this.players)
+          this.$emit('changePlayerInfo', this.selectedPlayer, number, name)
         }
       }
     },
@@ -265,59 +262,10 @@ export default {
       console.log('screen: ', this.screenWidth, this.screenHeight)
       console.log('field: ', this.fieldWidth, this.fieldHeight)
     },
-    changeEnds() {
-      // rotation matrix
-      // |X|   | -1,  0, 2cx |   |x|
-      // |Y| = |  0, -1, 2cy | x |y|
-      // |1| = |  0,  0,   1 |   |1|
-      // X = -x + 2cx
-      // Y = -y + 2cy
-      // (x, y) (cx, cy)
-      let cx = Config.NORMALIZED.CENTERMARK.LEFT;
-      let cy = Config.NORMALIZED.CENTERMARK.TOP;
-
-      for (let p of this.players) {
-          if (p.y < Config.NORMALIZED.BENCH.TOP) {
-              p.x = 2*cx - p.x;
-              p.y = 2*cy - p.y;
-          }
-      }
-    }
   },
   created() {
-    if (localStorage[Config.LAST_FIELD_DATA]) {
-      let lastFieldData = JSON.parse(localStorage[Config.LAST_FIELD_DATA])
-      console.log('created: ', lastFieldData)
-      if (lastFieldData.version == Config.VERSION) {
-        this.players = lastFieldData.players
-        this.teamColor = lastFieldData.color
-      }
-      else {
-        // todo old format
-        console.log('check local storage version', lastFieldData.version)
-      }
-    }
-
-    if (this.players.length == 0) {
-      this.players = Players.newPlayers(null)
-    }
-
-    this.$emit('changePlayerInfo', this.players)
-
-    // RGB to Hex
-    let teamColor = ''
-    let delimiter = ','
-    for (let t = 0; t < this.teamColor.length; t++) {
-      let rgba = this.teamColor[t].split('(')[1].split(')')[0].split(',')
-      teamColor += '#'
-      for (let c = 0; c < 3; c++) {
-        teamColor += `0${parseInt(rgba[c]).toString(16)}`.slice(-2)
-      }
-      teamColor += delimiter
-      delimiter = ''
-    }
-    this.$emit('changeTeamColors', teamColor)
-
+    this.players = this.playerInfo
+    this.teamColor = hex2rgba(this.colors)
     this.visibility.forEach((team) => {
       for (let i = 0; i < Config.NUMBER_OF_PLAYERS; i++) {
         team.push('visibile')
@@ -333,50 +281,14 @@ export default {
     this.screenResize()
   },
   watch: {
-    players: {
-      deep: true,
-      handler() {
-        localStorage[Config.LAST_FIELD_DATA] = JSON.stringify({
-          version: Config.VERSION,
-          players: this.players,
-          color: this.teamColor,
-        })
-      }
-    },
-    members: function(newMember) {
-      let teams = newMember.split('\n\n')
-      let newTeams = {}
-      teams.forEach((team, teamId) => {
-        if (team == "") return
-        newTeams[teamId] = team.split('\n')
-      })
-      this.players.forEach((player) => {
-        let newPlayer = newTeams[player.team][player.id].split(',')
-        player.number = newPlayer[0]
-        player.name = newPlayer[1]
-      })
+    playerInfo: function() {
+      console.log('update playerInfo:')
+      this.players = this.playerInfo
+      this.screenResize()
     },
     colors: function(newColors) {
-      let c = newColors.split(',')
-      if (c.length != 2) return
-      let home = [ // Hex to RGB
-        parseInt(c[0].substring(1, 3), 16),
-        parseInt(c[0].substring(3, 5), 16),
-        parseInt(c[0].substring(5, 7), 16)
-      ]
-      let away = [ // Hex to RGB
-        parseInt(c[1].substring(1, 3), 16),
-        parseInt(c[1].substring(3, 5), 16),
-        parseInt(c[1].substring(5, 7), 16)
-      ]
-      this.teamColor = [
-        `rgba(${home.join(',')}, 0.8)`,
-        `rgba(${away.join(',')}, 0.8)`,
-      ]
-    },
-    isChangeEnds: function() {
-      this.changeEnds()
-      this.screenResize()
+      console.log('get colors')
+      this.teamColor = hex2rgba(newColors)
     },
     save: function() {
       Capture.capture({
@@ -414,13 +326,7 @@ export default {
         noBench: this.noBench
       })
     },
-    formations: function() {
-      console.log('detected formation change')
-      this.players = Players.newPlayers(this.formations)
-      this.screenResize()
-      this.$emit('changePlayerInfo', this.players)
-    }
-  }
+  },
 }
 </script>
 

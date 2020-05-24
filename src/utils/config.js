@@ -33,6 +33,10 @@ export const FORMATIONS = [
   '5-4-1',
 ]
 
+// default team colors
+export const TEAM_COLORS = '#FF0000,#0000FF'
+export const PLAYER_ALPHA = 0.8
+
 // field.png size [px]
 export const PNG = {
   WIDTH: 1280,

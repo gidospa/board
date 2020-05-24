@@ -15,12 +15,11 @@
     @changeEnds="changeEnds">
   </Member>
   <Field 
-    :members="members"
     :colors="colors"
-    :isChangeEnds="isChangeEnds"
     :save="doSave"
     :capture="doCapture"
-    :formations="formations"
+    :playerInfo="players"
+    @updatePlayerPosition="updatePlayerPosition"
     @changePlayerInfo="changePlayerInfo" 
     @changeTeamColors="changeTeamColors"
     @doneSave="doneSave"
@@ -36,6 +35,9 @@ import Member from './components/Member.vue'
 import Files from './components/Files.vue'
 import Storage from './components/Storage.vue'
 import Modal from './components/Modal.vue'
+import Players from './utils/players.js'
+import * as Config from './utils/config.js'
+import {rgba2hex, hex2rgba} from './utils/color.js'
 
 export default {
   name: 'App',
@@ -48,9 +50,8 @@ export default {
   },
   data() {
     return {
-      members: '',
-      colors: '',
-      isChangeEnds: false,
+      colors: Config.TEAM_COLORS,
+      players: [],
       doCapture: false,
       doSave: false,
       storage: [],
@@ -58,39 +59,67 @@ export default {
       modalType: 'delete-field',
       modalParam: {},
       capture: {image: ''},
-      formations: []
     }
   },
   methods: {
+    saveToLocalStorage() {
+      localStorage[Config.LAST_FIELD_DATA] = JSON.stringify({
+          version: Config.VERSION,
+          players: this.players,
+          color: hex2rgba(this.colors),
+      })
+    },
+    updatePlayerPosition(players) {
+      this.players = players
+      this.saveToLocalStorage()
+    },
     changeMemberList(memberList) {
-      this.members = memberList
+      let teams = memberList.split('\n\n')
+      let newTeams = {}
+      teams.forEach((team, teamId) => {
+        if (team == "") return
+        newTeams[teamId] = team.split('\n')
+      })
+      this.players.forEach((player) => {
+        let newPlayer = newTeams[player.team][player.id].split(',')
+        player.number = newPlayer[0]
+        player.name = newPlayer[1]
+      })
+      this.saveToLocalStorage()
     },
     changeTeamColors(colors) {
       this.colors = colors
-      console.log(this.colors)
+      this.saveToLocalStorage()
     },
-    changePlayerInfo(players) {
-      let members = [Array(players.length),Array(players.length)]
-
-      // sort by 'team' and 'id'
-      for (let p of players) {
-        members[p.team][p.id] = `${p.number},${p.name}`
-      }
-
-      // to string
-      let strMembers = ''
-      for (let team = 0; team < 2; team++) {
-        for (let p of members[team]) {
-          if (p) {
-            strMembers += p + '\n'
-          }
+    changePlayerInfo(player, number, name) {
+      for (let p of this.players) {
+        if (p.team == player.team && p.id == player.id) {
+          p.number = number
+          p.name = name
         }
-        strMembers += '\n' // seperator of each team
       }
-      this.members = strMembers
+      this.saveToLocalStorage()
     },
     changeEnds() {
-      this.isChangeEnds = !this.isChangeEnds
+      // rotation matrix
+      // |X|   | -1,  0, 2cx |   |x|
+      // |Y| = |  0, -1, 2cy | x |y|
+      // |1| = |  0,  0,   1 |   |1|
+      // X = -x + 2cx
+      // Y = -y + 2cy
+      // (x, y) (cx, cy)
+      let cx = Config.NORMALIZED.CENTERMARK.LEFT;
+      let cy = Config.NORMALIZED.CENTERMARK.TOP;
+
+      for (let p of this.players) {
+          if (p.y < Config.NORMALIZED.BENCH.TOP) {
+              p.x = 2*cx - p.x;
+              p.y = 2*cy - p.y;
+          }
+      }
+      this.players.splice(0, 1, this.players[0]) // update DOM
+      this.saveToLocalStorage()
+      console.log('changeEnds')
     },
     saveField() {
       console.log('saved filed')
@@ -101,7 +130,9 @@ export default {
     },
     closeModal(state) {
       this.showModal = false
-      if (this.modalType === 'delete-field') {
+      console.log('close modal')
+
+if (this.modalType === 'delete-field') {
         if (state.type === 'delete') {
           this.storage.splice(state.index, 1)
         }
@@ -119,7 +150,8 @@ export default {
               formations.push(f.map(Number))
             }
           }
-          this.formations = formations
+          this.players = Players.newPlayers(formations)
+          this.saveToLocalStorage()
         }
       }
     },
@@ -132,7 +164,7 @@ export default {
     openNewField() {
       console.log("openNewfield")
       this.modalType = 'open-new-field'
-      
+
       let c = this.colors.split(',')
       this.modalParam = {homeColor:c[0], awayColor:c[1]}
       
@@ -147,6 +179,49 @@ export default {
     },
     doneCapture(image) {
       this.capture = {image}
+    }
+  },
+  created() {
+    if (localStorage[Config.LAST_FIELD_DATA]) {
+      let lastFieldData = JSON.parse(localStorage[Config.LAST_FIELD_DATA])
+      if (lastFieldData.version == Config.VERSION) {
+        this.players = lastFieldData.players
+        this.colors = rgba2hex(lastFieldData.color)
+      }
+      else {
+        // todo old format
+        console.log('check local storage version', lastFieldData.version)
+      }
+    }
+
+    if (this.players.length == 0) {
+      this.players = Players.newPlayers(null)
+    }
+  },
+  watch: {
+    players: function() {
+      console.log('watch players')
+    }
+  },
+  computed: {
+    members: function() {
+      // sort by 'team' and 'id'
+      let members = [Array(this.players.length), Array(this.players.length)]
+      for (let p of this.players) {
+        members[p.team][p.id] = `${p.number},${p.name}`
+      }
+
+      // to string
+      let strMembers = ''
+      for (let team = 0; team < 2; team++) {
+        for (let p of members[team]) {
+          if (p) {
+            strMembers += p + '\n'
+          }
+        }
+        strMembers += '\n' // seperator of each team
+      }
+      return strMembers
     }
   }
 }
