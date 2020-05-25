@@ -26,8 +26,8 @@ import {hex2rgba} from '../utils/color.js'
 export default {
   props: {
     colors: String,
-    save: Boolean,
-    capture: Boolean,
+    save: Object,
+    capture: Object,
     playerInfo: Array,
   },
   data() {

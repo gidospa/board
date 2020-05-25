@@ -52,8 +52,8 @@ export default {
     return {
       colors: Config.TEAM_COLORS,
       players: [],
-      doCapture: false,
-      doSave: false,
+      doCapture: {},
+      doSave: {},
       storage: [],
       showModal: false,
       modalType: 'delete-field',
@@ -123,7 +123,7 @@ export default {
     },
     saveField() {
       console.log('saved filed')
-      this.doSave = !this.doSave
+      this.doSave = {} // fire method in Field.vue
     },
     doneSave(field) {
       this.storage.unshift(field)
@@ -132,7 +132,7 @@ export default {
       this.showModal = false
       console.log('close modal')
 
-if (this.modalType === 'delete-field') {
+      if (this.modalType === 'delete-field') {
         if (state.type === 'delete') {
           this.storage.splice(state.index, 1)
         }
@@ -175,7 +175,7 @@ if (this.modalType === 'delete-field') {
     },
     captureField() {
       console.log('captured field')
-      this.doCapture = !this.doCapture
+      this.doCapture = {} // fire method in Field.vue
     },
     doneCapture(image) {
       this.capture = {image}
