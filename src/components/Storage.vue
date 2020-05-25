@@ -10,10 +10,10 @@
     Capture
   </div>
   <span class="blank">&nbsp;</span>
-  <div class="storage-button">
+  <div class="storage-button" @click="dropboxStorage">
     Dropbox
   </div>
-  <div class="storage-button">
+  <div class="storage-button" @click="googleStorage">
     Google
   </div>
   <div class="storage-button" id="clear-local-storage">
@@ -24,10 +24,27 @@
 
 <script>
 import {CAPTURE_FILE_PREFIX} from '../utils/config.js'
+import {local, google, dropbox} from '../utils/io.js'
 
 export default {
   props: {
-    capture: Object
+    capture: Object,
+    storage: Array,
+  },
+  data: function() {
+    return {
+      currentStorage: {},
+    }
+  },
+  methods: {
+    googleStorage() {
+      console.log('change storage to Google Drive')
+      this.currentStorage = google
+    },
+    dropboxStorage() {
+      console.log('change storage to Dropbox')
+      this.currentStorage = dropbox
+    }
   },
   watch: {
     capture: function() {
@@ -52,6 +69,20 @@ export default {
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
+    },
+    storage: function(newStorage) {
+      console.log('Storage detected changing storage')
+      this.currentStorage.save(newStorage)
+    }
+  },
+  created() {
+    this.currentStorage = local
+    let fieldDataList = this.currentStorage.load()
+    console.log('local storage fields:', fieldDataList)
+    if (fieldDataList) {
+      if ('boardStorage' in fieldDataList) {
+        this.$emit('changeStorage', fieldDataList.boardStorage)
+      }
     }
   }
 }

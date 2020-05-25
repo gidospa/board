@@ -1,6 +1,11 @@
 <template>
 <div id="app">
-  <Storage :capture="capture" @changeStorage="changeStorage" @captureField="captureField"></Storage>
+  <Storage
+    :capture="capture"
+    :storage="storage" 
+    @changeStorage="changeStorage" 
+    @captureField="captureField">
+  </Storage>
   <Files
     :storage="storage"
     @saveField="saveField"
@@ -56,7 +61,7 @@ export default {
       doSave: {},
       storage: [],
       showModal: false,
-      modalType: 'delete-field',
+      modalType: 'saved-field',
       modalParam: {},
       capture: {image: ''},
     }
@@ -132,9 +137,13 @@ export default {
       this.showModal = false
       console.log('close modal')
 
-      if (this.modalType === 'delete-field') {
+      if (this.modalType === 'saved-field') {
         if (state.type === 'delete') {
           this.storage.splice(state.index, 1)
+        }
+        if (state.type === 'open') {
+          this.players = this.storage[state.index].players
+          this.colors = rgba2hex(this.storage[state.index].color)          
         }
       }
       if (this.modalType === 'open-new-field') {
@@ -157,7 +166,7 @@ export default {
     },
     onClickIcon(index) {
       console.log(index)
-      this.modalType = 'delete-field'
+      this.modalType = 'saved-field'
       this.modalParam = {index, icon:this.storage[index].icon, timestamp:this.storage[index].timestamp}
       this.showModal = true
     },
@@ -170,8 +179,9 @@ export default {
       
       this.showModal = true
     },
-    changeStorage() {
+    changeStorage(fields) {
       console.log('changeStorage')
+      this.storage = fields
     },
     captureField() {
       console.log('captured field')

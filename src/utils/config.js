@@ -8,6 +8,7 @@ export const CAPTURE_FILE_PREFIX = 'field_'
 
 // localStorage
 export const LAST_FIELD_DATA = 'lastField';
+export const FIELD_DATA_LIST = 'fields'
 
 // field size [m]
 export const REAL_FIELD_SIZE = {

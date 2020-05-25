@@ -2,7 +2,7 @@
   <div id="modal-dialog">
     <div class="dialog-overlay"></div>
     
-    <div class="modal-container" v-if="type == 'delete-field'">
+    <div class="modal-container" v-if="type == 'saved-field'">
       <div class="modal-close">
         <div><span @click="$emit('close', {type:'close'})">&times;</span></div>
       </div>
