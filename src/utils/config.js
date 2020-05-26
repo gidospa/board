@@ -4,11 +4,14 @@ export const PREVIEW_IMAGE_WIDTH = 256;
 export const CAPTURE_IMAGE_WIDTH = 1920;
 
 // capture file name
-export const CAPTURE_FILE_PREFIX = 'field_'
+export const CAPTURE_FILE_PREFIX = 'field_';
 
 // localStorage
 export const LAST_FIELD_DATA = 'lastField';
-export const FIELD_DATA_LIST = 'fields'
+export const FIELD_DATA_LIST = 'fields';
+
+// import field
+export const EXPORT_FILE_NAME_PREFIX = 'field_';
 
 // field size [m]
 export const REAL_FIELD_SIZE = {

@@ -1,19 +1,20 @@
 <template>
 <div id="storage">
   <div class="storage-button">
-    <label>Import</label>
+    <label for="import-board">Import</label>
+    <input id="import-board" type="file" accept="text/plain, application/json" style="display:none" @change="onImport">
   </div>
-  <div class="storage-button">
+  <div class="storage-button" @click="$emit('exportField')">
     Export
   </div>
   <div class="storage-button" @click="$emit('captureField')">
     Capture
   </div>
   <span class="blank">&nbsp;</span>
-  <div class="storage-button" @click="dropboxStorage">
+  <div id="dropbox" class="storage-button" @click="dropboxStorage">
     Dropbox
   </div>
-  <div class="storage-button" @click="googleStorage">
+  <div id="google" class="storage-button" @click="googleStorage">
     Google
   </div>
   <div class="storage-button" id="clear-local-storage">
@@ -23,13 +24,14 @@
 </template>
 
 <script>
-import {CAPTURE_FILE_PREFIX} from '../utils/config.js'
-import {local, google, dropbox} from '../utils/io.js'
+import {CAPTURE_FILE_PREFIX, EXPORT_FILE_NAME_PREFIX} from '../utils/config.js'
+import {local, google, dropbox, getDatetime, download} from '../utils/io.js'
 
 export default {
   props: {
     capture: Object,
     storage: Array,
+    exportFieldData: Object,
   },
   data: function() {
     return {
@@ -41,34 +43,51 @@ export default {
       console.log('change storage to Google Drive')
       this.currentStorage = google
     },
-    dropboxStorage() {
-      console.log('change storage to Dropbox')
-      this.currentStorage = dropbox
-    }
+    dropboxStorage(e) {
+      let dbx = document.getElementById('dropbox')
+
+      if (e.target.classList.contains('connected')) {
+        console.log('change storage to localStorage')
+        dbx.classList.remove('connected')
+        this.currentStorage = local
+      }
+      else {
+        console.log('change storage to Dropbox')
+        dbx.classList.add('connected')
+        this.currentStorage = dropbox
+      }
+    },
+    onImport(e) {
+      const fieldFile = e.target.files[0]
+      e.target.value = '' // fire when same file is selected next time
+
+      let reader = new FileReader()
+      reader.addEventListener('load', () => {
+        try {
+          let field = JSON.parse(reader.result)
+          if (field) {
+            this.$emit('importField', {players:field.players, color:field.color})
+          }
+        }
+        catch (e) {
+          console.error(e)
+        }
+      })
+      reader.readAsText(fieldFile)
+    },
   },
   watch: {
     capture: function() {
-      console.log(this.capture)
-
-      // filename
-      let now = new Date()
-      let datetime = now.getFullYear()
-      datetime += ('0' + (now.getMonth()+1)).slice(-2)
-      datetime += ('0' + now.getDate()).slice(-2)
-      datetime += '-'
-      datetime += ('0' + now.getHours()).slice(-2)
-      datetime += ('0' + now.getMinutes()).slice(-2)
-      datetime += ('0' + now.getSeconds()).slice(-2)
-      let filename = CAPTURE_FILE_PREFIX + datetime + '.png'
+      let filename = CAPTURE_FILE_PREFIX + getDatetime() + '.png'
       console.log(filename)
 
-      // download capture image
-      let a = document.createElement('a')
-      a.download = filename
-      a.href = this.capture.image
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      download(filename, this.capture.image)
+    },
+    exportFieldData: function() {
+      let filename = EXPORT_FILE_NAME_PREFIX + getDatetime() + '.txt'
+      let boardString = JSON.stringify(this.exportFieldData)
+      let url = URL.createObjectURL(new Blob([boardString], {type: 'text/play'}))
+      download(filename, url)
     },
     storage: function(newStorage) {
       console.log('Storage detected changing storage')
@@ -123,5 +142,9 @@ export default {
 }
 .blank {
   padding: 0 0.5rem;
+}
+.connected {
+  background: #007ee5 !important;
+  color: white !important;
 }
 </style>

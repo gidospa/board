@@ -2,9 +2,12 @@
 <div id="app">
   <Storage
     :capture="capture"
-    :storage="storage" 
+    :storage="storage"
+    :exportFieldData="exportFieldData"
     @changeStorage="changeStorage" 
-    @captureField="captureField">
+    @captureField="captureField"
+    @importField="importField"
+    @exportField="exportField">
   </Storage>
   <Files
     :storage="storage"
@@ -64,6 +67,7 @@ export default {
       modalType: 'saved-field',
       modalParam: {},
       capture: {image: ''},
+      exportFieldData: {},
     }
   },
   methods: {
@@ -189,6 +193,14 @@ export default {
     },
     doneCapture(image) {
       this.capture = {image}
+    },
+    importField(field) {
+      this.players = field.players
+      this.colors = field.color
+    },
+    exportField() {
+      console.log('export filed')
+      this.exportFieldData = {version: Config.VERSION, players: this.players, color: this.colors}
     }
   },
   created() {

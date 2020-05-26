@@ -97,17 +97,4 @@ function capture({teams, w, onLoad, isLandscape=true, noBench=false}={}) {
     image.src = fieldImage
 }
 
-/*
-function canvasToDataURL(width) {
-    let height = this.canvas.height/this.canvas.width*width; // keep aspect ratio
-    let iconCanvas = document.createElement('canvas');
-    iconCanvas.width = width;
-    iconCanvas.height = height;
-
-    let context = iconCanvas.getContext('2d');
-    context.drawImage(this.canvas, 0, 0, this.canvas.width, this.canvas.height, 0, 0, width, height);
-
-    return iconCanvas.toDataURL();
-}*/
-
 export default { capture }

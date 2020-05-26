@@ -56,3 +56,25 @@ export const dropbox = {
     return fieldDataList
   }
 }
+
+export function getDatetime() {
+  let now = new Date()
+  let datetime = now.getFullYear();
+  datetime += ('0' + (now.getMonth()+1)).slice(-2);
+  datetime += ('0' + now.getDate()).slice(-2);
+  datetime += '-';
+  datetime += ('0' + now.getHours()).slice(-2);
+  datetime += ('0' + now.getMinutes()).slice(-2);
+  datetime += ('0' + now.getSeconds()).slice(-2);
+
+  return datetime;
+}
+
+export function download(filename, url) {
+  let a = document.createElement('a')
+  a.download = filename
+  a.href = url
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
