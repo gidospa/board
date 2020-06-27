@@ -19,9 +19,6 @@ export default {
     }
   },
   methods: {
-    onClickAppend() {
-      console.log('append')
-    },
     onClickIcon(index) {
       console.log("click icon", index)
       this.$emit("clickIcon", index)
@@ -29,6 +26,7 @@ export default {
   },
   watch: {
     storage: function() {
+      console.log('update boards list')
       this.fieldStorage = this.storage
     }
   }

@@ -11,7 +11,9 @@ export const LAST_FIELD_DATA = 'lastField';
 export const FIELD_DATA_LIST = 'fields';
 
 // import field
-export const EXPORT_FILE_NAME_PREFIX = 'field_';
+//export const EXPORT_FILE_NAME_PREFIX = 'field_';
+export const EXPORT_FILE_NAME_PREFIX = 'board_tucana_ga';
+export const PLAYER_DB_FILE_PREFIX = 'players_tucana_ga';
 
 // field size [m]
 export const REAL_FIELD_SIZE = {

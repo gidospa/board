@@ -135,7 +135,7 @@ export default {
       this.doSave = {} // fire method in Field.vue
     },
     doneSave(field) {
-      this.storage.unshift(field)
+      this.storage.append(field)
     },
     closeModal(state) {
       this.showModal = false
@@ -143,7 +143,7 @@ export default {
 
       if (this.modalType === 'saved-field') {
         if (state.type === 'delete') {
-          this.storage.splice(state.index, 1)
+          this.storage.remove(state.index)
         }
         if (state.type === 'open') {
           this.players = this.storage[state.index].players

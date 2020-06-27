@@ -11,7 +11,7 @@
     Capture
   </div>
   <span class="blank">&nbsp;</span>
-  <div id="dropbox" class="storage-button" @click="dropboxStorage">
+  <div v-show="isDropboxAvailable" id="dropbox" class="storage-button" @click="dropboxStorage">
     Dropbox
   </div>
   <div id="google" class="storage-button" @click="googleStorage">
@@ -30,31 +30,39 @@ import {local, google, dropbox, getDatetime, download} from '../utils/io.js'
 export default {
   props: {
     capture: Object,
-    storage: Array,
     exportFieldData: Object,
   },
   data: function() {
     return {
       currentStorage: {},
+      isDropboxAvailable: false,
     }
   },
   methods: {
     googleStorage() {
       console.log('change storage to Google Drive')
       this.currentStorage = google
+      this.$emit('changeStorage', this.currentStorage)
     },
     dropboxStorage(e) {
-      let dbx = document.getElementById('dropbox')
-
       if (e.target.classList.contains('connected')) {
         console.log('change storage to localStorage')
+        let dbx = document.getElementById('dropbox')
         dbx.classList.remove('connected')
         this.currentStorage = local
+        this.$emit('changeStorage', this.currentStorage)
       }
       else {
-        console.log('change storage to Dropbox')
-        dbx.classList.add('connected')
-        this.currentStorage = dropbox
+        console.log('change storage to Dropbox:')
+        dropbox.fetch(() => {
+          console.log('connected to Dropbox:')
+          this.currentStorage = dropbox
+          this.$emit('changeStorage', this.currentStorage)
+          let dbx = document.getElementById('dropbox')
+          dbx.classList.add('connected')
+        }, () => {
+          console.log('fail to connect to Dropbox:')
+        })
       }
     },
     onImport(e) {
@@ -89,19 +97,34 @@ export default {
       let url = URL.createObjectURL(new Blob([boardString], {type: 'text/play'}))
       download(filename, url)
     },
-    storage: function(newStorage) {
-      console.log('Storage detected changing storage')
-      this.currentStorage.save(newStorage)
-    }
   },
-  created() {
+  mounted() {
     this.currentStorage = local
-    let fieldDataList = this.currentStorage.load()
-    console.log('local storage fields:', fieldDataList)
-    if (fieldDataList) {
-      if ('boardStorage' in fieldDataList) {
-        this.$emit('changeStorage', fieldDataList.boardStorage)
-      }
+    this.currentStorage.fetch()
+    this.$emit('changeStorage', this.currentStorage)
+    
+    // initialize Dropbox
+    dropbox.startConnecting = function() {
+      let dbx = document.getElementById('dropbox')
+      dbx.classList.add('connecting')
+    }
+    dropbox.endConnecting = function() {
+      let dbx = document.getElementById('dropbox')
+      dbx.classList.remove('connecting')
+    }
+    let dbx = document.getElementById('dropbox')
+    switch (dropbox.isAvailable()) {
+    case 'available':
+      this.isDropboxAvailable = true
+      break
+    case 'unavailable':
+      this.isDropboxAvailable = false
+      break
+    case 'connected': // Dropbox OAuth redirecting
+      this.isDropboxAvailable = true
+      dbx.classList.add('connected')
+      this.currentStorage = dropbox
+      break
     }
   }
 }
@@ -146,5 +169,22 @@ export default {
 .connected {
   background: #007ee5 !important;
   color: white !important;
+}
+.connecting {
+    animation-name: blink-background;
+    animation-duration: 2s;
+    animation-timing-function: ease;
+    animation-iteration-count: infinite;
+}
+@keyframes blink-background {
+    0% {
+        border-color: #0000ff;
+    }
+    50% {
+        border-color: #ffffff;
+    }
+    100% {
+        border-color: #0000ff;
+    }
 }
 </style>
