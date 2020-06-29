@@ -112,9 +112,8 @@ dropbox.fetch = function(success, failure) {
     },
     onError: (e) => {
       console.log('incomplete dropbox authenticate');
-      console.log(e);
       this.endConnecting && this.endConnecting()
-      failure && failure()
+      failure && failure(e)
     }
   }
 
@@ -126,14 +125,13 @@ dropbox.download = function(success, failure) {
   let callbacks = {
     onComplete: (result, response) => {this.loadBoard(result, response, success, failure)},
     onError: (e) => {
-      console.log(e);
       switch (e.status) {
       case 401: // Unauthorized
         console.log('401 Unauthorized')
         console.log('remove dropbox access token');
         Dropbox.clear();
         this.endConnecting && this.endConnecting()
-        failure && failure()
+        failure && failure(e)
         break;
           
       case 409: // Conflict(path not found)
@@ -144,7 +142,7 @@ dropbox.download = function(success, failure) {
       default:
         console.log('cannot download from dropbox');
         this.endConnecting && this.endConnecting()
-        failure && failure()
+        failure && failure(e)
       }
     }
   }
@@ -164,13 +162,12 @@ dropbox.loadBoard = function(result, response, success, failure) {
       }
       else {
         self.endConnecting && self.endConnecting()
-        failure && failure()
+        failure && failure(`parsing ${DROPBOX_FIELD_FILE} failed`)
       }
     }
     catch (e) {
-      console.error(e)
       self.endConnecting && self.endConnecting()
-      failure && failure()
+      failure && failure(e)
     }
   })
 
@@ -189,8 +186,7 @@ dropbox.createNewFile = function(success, failure) {
     },
     onError: (e) => {
       console.log(`cannot create ${DROPBOX_FIELD_FILE}`)
-      console.log(e)
-      failure && failure()
+      failure && failure(e)
       this.endConnecting && this.endConnecting()
     }
   }
@@ -203,10 +199,10 @@ dropbox.append = function(board, success, failure) {
   let newBoardsString = JSON.stringify(newBoards)
   this.upload(newBoardsString, () => {
     this.download(success, failure)
-  }, () => {
+  }, (e) => {
     console.log('fail to append')
     this.endConnecting && this.endConnecting()
-    failure && failure()
+    failure && failure(e)
   })
 }
 dropbox.remove = function(n, success, failure) {
@@ -217,10 +213,10 @@ dropbox.remove = function(n, success, failure) {
   let newBoardsString = JSON.stringify(newBoards)
   this.upload(newBoardsString, () => {
     this.download(success, failure)
-  }, () => {
+  }, (e) => {
     console.log('fail to append')
     this.endConnecting && this.endConnecting()
-    failure && failure()
+    failure && failure(e)
   })
 }
 dropbox.upload = function(contents, success, failure) {
@@ -230,9 +226,9 @@ dropbox.upload = function(contents, success, failure) {
   }
   let callbacks = {
     onComplete: () => {this.download(success, failure)},
-    onError: () => {
+    onError: (e) => {
       this.endConnecting && this.endConnecting()
-      failure && failure()
+      failure && failure(e)
     }
   }
   Dropbox('files/upload', param, contents, callbacks)

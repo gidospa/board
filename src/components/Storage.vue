@@ -55,13 +55,13 @@ export default {
       else {
         console.log('change storage to Dropbox:')
         dropbox.fetch(() => {
-          console.log('connected to Dropbox:')
+          console.log('connected to Dropbox')
           this.currentStorage = dropbox
           this.$emit('changeStorage', this.currentStorage)
           let dbx = document.getElementById('dropbox')
           dbx.classList.add('connected')
-        }, () => {
-          console.log('fail to connect to Dropbox:')
+        }, (e) => {
+          console.log('fail to connect to Dropbox:', e)
         })
       }
     },
@@ -112,7 +112,6 @@ export default {
       let dbx = document.getElementById('dropbox')
       dbx.classList.remove('connecting')
     }
-    let dbx = document.getElementById('dropbox')
     switch (dropbox.isAvailable()) {
     case 'available':
       this.isDropboxAvailable = true
@@ -122,8 +121,15 @@ export default {
       break
     case 'connected': // Dropbox OAuth redirecting
       this.isDropboxAvailable = true
-      dbx.classList.add('connected')
-      this.currentStorage = dropbox
+      dropbox.fetch(() => {
+        console.log('connected to Dropbox')
+        this.currentStorage = dropbox
+        this.$emit('changeStorage', this.currentStorage)
+        let dbx = document.getElementById('dropbox')
+        dbx.classList.add('connected')
+      }, (e) => {
+        console.log('fail to connect to Dropbox:', e)
+      })
       break
     }
   }
