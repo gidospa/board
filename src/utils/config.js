@@ -9,6 +9,7 @@ export const CAPTURE_FILE_PREFIX = 'field_';
 // localStorage
 export const LAST_FIELD_DATA = 'lastField';
 export const FIELD_DATA_LIST = 'fields';
+export const PLAYER_DB = 'playerDB';
 
 // import field
 //export const EXPORT_FILE_NAME_PREFIX = 'field_';

@@ -1,4 +1,4 @@
-import {FIELD_DATA_LIST, EXPORT_FILE_NAME_PREFIX, PLAYER_DB_FILE_PREFIX} from './config.js'
+import {FIELD_DATA_LIST, PLAYER_DB, EXPORT_FILE_NAME_PREFIX, PLAYER_DB_FILE_PREFIX} from './config.js'
 import Dropbox from './dropbox.js'
 
 /*================================================================================ 
@@ -106,12 +106,12 @@ dropbox.fetch = function(success, failure) {
   };
   let callbacks = {
     onComplete: () => {
-      console.log('complete dropbox authenticate');
-      this.download(success, failure);
-      //this._downloadPlayerDBFromDropbox();
+      console.log('complete dropbox authenticate')
+      this.download(success, failure)
+      this.downloadPlayerDB()
     },
     onError: (e) => {
-      console.log('incomplete dropbox authenticate');
+      console.log('incomplete dropbox authenticate')
       this.endConnecting && this.endConnecting()
       failure && failure(e)
     }
@@ -233,9 +233,40 @@ dropbox.upload = function(contents, success, failure) {
   }
   Dropbox('files/upload', param, contents, callbacks)
 }
+dropbox.downloadPlayerDB = function() {
+  let callbacks = {
+    onComplete: (result, response) => {
+      let reader = new FileReader()
+      reader.addEventListener('loadend', () => {
+        try {
+          let playerDB = JSON.parse(reader.result)
+          let playerDBString = JSON.stringify(playerDB)
+          if (playerDB) {
+            localStorage.setItem(PLAYER_DB, playerDBString)
+            this.availablePlayerDB && this.availablePlayerDB(playerDB['version'])
+          }
+        }
+        catch (e) {
+          console.log(`cannot parse ${PLAYER_DB}:`, e)
+        }
+      })
+      reader.readAsText(response)
+    },
+    onError: (e) => {
+      switch (e.status) {
+      case 401: // Unauthorized
+        console.log('401 Unauthorized')
+        break;
+      default:
+        console.log('playerDB not found');
+      }
+    }
+  }
+  Dropbox('files/download', {path: DROPBOX_PLAYER_DB_FILE}, callbacks);
+}
 dropbox.startConnecting = null
 dropbox.endConnectig = null
-
+dropbox.availablePlayerDB = null
 
 /*================================================================================ 
 ** storage template

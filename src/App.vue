@@ -18,9 +18,12 @@
   <Member
     :members="members"
     :colors="colors"
+    :dbversion="playerDB.version"
     @changeMemberList="changeMemberList"
     @changeTeamColors="changeTeamColors"
-    @changeEnds="changeEnds">
+    @changeEnds="changeEnds"
+    @showTeamId="showTeamId"
+    @loadPlayerDB="loadPlayerDB">
   </Member>
   <Field 
     :colors="colors"
@@ -60,6 +63,7 @@ export default {
     return {
       colors: Config.TEAM_COLORS,
       players: [],
+      playerDB: {},
       doCapture: {},
       doSave: {},
       storage: [],
@@ -82,17 +86,26 @@ export default {
       this.players = players
       this.saveToLocalStorage()
     },
-    changeMemberList(memberList) {
+    changeMemberList(memberList, teamName) {
       let teams = memberList.split('\n\n')
       let newTeams = {}
       teams.forEach((team, teamId) => {
         if (team == "") return
         newTeams[teamId] = team.split('\n')
+        if (this.playerDB['teams'] && this.playerDB['teams'][teamName[teamId]]) {
+          newTeams[teamId].playerDB = this.playerDB['teams'][teamName[teamId]].players
+        }
       })
       this.players.forEach((player) => {
         let newPlayer = newTeams[player.team][player.id].split(',')
         player.number = newPlayer[0]
         player.name = newPlayer[1]
+        if (!player.name && newTeams[player.team].playerDB) {
+          let name = newTeams[player.team].playerDB[player.number]
+          if (name) {
+            player.name = name
+          }
+        }
       })
       this.saveToLocalStorage()
     },
@@ -129,6 +142,61 @@ export default {
       this.players.splice(0, 1, this.players[0]) // update DOM
       this.saveToLocalStorage()
       console.log('changeEnds')
+    },
+    loadPlayerDB() {
+      let playerDB = {}
+      try {
+        playerDB = JSON.parse(localStorage.getItem(Config.PLAYER_DB))
+      }
+      catch (e) {
+        console.log("can't parse player DB")
+        return;
+      }
+      if (!playerDB) return;
+
+      this.playerDB = playerDB
+      console.log(this.playerDB.version)
+      let pdb = document.getElementById('player-db-information')
+      pdb.style.visibility = 'visible'
+    },
+    showTeamId() {
+      console.log('showTeamId')
+      if (!this.playerDB) return;
+
+      let categoryList = {}
+      for (const team in this.playerDB.teams) {
+        let category = this.playerDB.teams[team].category
+        if (!categoryList[category]) {
+          categoryList[category] = []
+        }
+        categoryList[category].push(team)
+      }
+
+      let teamHtml = ''
+      for (const category in categoryList) {
+        let n = categoryList[category].length
+        let max_team_number_in_row = 5
+        let rowNumber = Math.ceil(n/max_team_number_in_row)
+        teamHtml += `<div>${category}<div>`
+
+        let line = ''
+        for (const teamId of categoryList[category]) {
+          console.log(teamId, teamId.length, rowNumber)
+          if (line.length + teamId.length < 33) {
+            line += teamId + ' '
+          }
+          else {
+            teamHtml += `<div>${line}</div>`
+            line = teamId + ' '
+          }
+        }
+        teamHtml += `<div>${line}</div><br>`
+      }
+
+      // show modal
+      this.modalType = 'show-team-id'
+      this.modalParam = {teamHtml}
+      this.showModal = true
     },
     saveField() {
       console.log('saved filed')
@@ -218,6 +286,13 @@ export default {
 
     if (this.players.length == 0) {
       this.players = Players.newPlayers(null)
+    }
+  },
+  mounted() {
+    let playerDB = JSON.parse(localStorage.getItem(Config.PLAYER_DB))
+    if (playerDB) {
+
+      this.loadPlayerDB()
     }
   },
   watch: {

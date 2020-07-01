@@ -65,6 +65,17 @@
       </div>
     </div>
     
+    <div class="modal-container" v-if="type == 'show-team-id'">
+      <div class="modal-close">
+        <div><span @click="$emit('close', {type:'close'})">&times;</span></div>
+      </div>
+
+      <div class="modal-header">
+        Player DB teams list
+      </div>
+      <br>
+      <span class="team-id" v-html="field.teamHtml"></span>
+    </div>
 
   </div>
 </template>

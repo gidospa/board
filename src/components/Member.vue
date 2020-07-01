@@ -1,5 +1,8 @@
 <template>
 <div id="member">
+  <div id="player-db-information" @click="$emit('showTeamId')">
+       Player DB {{dbversion}}
+  </div>
   <div class="member">
     <input class="team-color" type="color" v-model="homeColor" list="colorList" />
   </div>
@@ -38,10 +41,13 @@
 </template>
 
 <script>
+import {dropbox} from '../utils/io.js'
+
 export default {
   props: {
     members: String,
     colors: String,
+    dbversion: String,
   },
   data() {
     return {
@@ -55,8 +61,10 @@ export default {
     onBlur() {
       let teams = [this.home, this.away]
       let newMember = ''
+      let teamName = []
       for (let team of teams) {
         let member = team.split('\n')
+        teamName.push(member[0])
         for (let player of member) {
           let info = player.split(',')
           let number = parseInt(info[0])
@@ -73,7 +81,7 @@ export default {
       let m = newMember.split('\n\n')
       this.home = m[0]
       this.away = m[1]
-      this.$emit("changeMemberList", newMember)
+      this.$emit("changeMemberList", newMember, teamName)
     },
     onClickChange() {
       this.$emit('changeEnds')
@@ -105,6 +113,11 @@ export default {
     awayColor: function() {
       this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
     },
+  },
+  mounted() {
+    dropbox.availablePlayerDB = () => {
+      this.$emit('loadPlayerDB')
+    }
   }
 }
 </script>
@@ -137,5 +150,16 @@ textarea {
   border: 1px solid #888;
   background-color: white;
   width: 5em;
+}
+#player-db-information {
+  display: block;
+  color: #ddd;
+  cursor: default;
+  visibility: hidden;
+}
+#player-db-information:hover,
+#player-db-information:focus
+{
+  color: #ccc;
 }
 </style>
