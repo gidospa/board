@@ -34,6 +34,7 @@
       <div class="modal-header">
         FORMATION
       </div>
+
       
       <div class="select-formation">
         <div class="formation-list" id="left-team">
@@ -64,6 +65,7 @@
         </div>
       </div>
     </div>
+
     
     <div class="modal-container" v-if="type == 'show-team-id'">
       <div class="modal-close">
@@ -75,6 +77,14 @@
       </div>
       <br>
       <span class="team-id" v-html="field.teamHtml"></span>
+      
+      <div class="modal-button">
+        <div class="center-button">
+          <button class="default-button" @click="$emit('close', {type:'delete'})">
+            DELETE PLAYER DB<br>FROM BROWSER
+          </button>
+        </div>
+      </div>
     </div>
 
   </div>

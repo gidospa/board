@@ -108,7 +108,13 @@ dropbox.fetch = function(success, failure) {
     onComplete: () => {
       console.log('complete dropbox authenticate')
       this.download(success, failure)
-      this.downloadPlayerDB()
+      if (!localStorage.getItem(PLAYER_DB)) {
+        console.log('download player db from dropbox')
+        this.downloadPlayerDB()
+      }
+      else {
+        console.log('player db already exists')
+      }
     },
     onError: (e) => {
       console.log('incomplete dropbox authenticate')

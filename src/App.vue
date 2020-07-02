@@ -159,6 +159,12 @@ export default {
       let pdb = document.getElementById('player-db-information')
       pdb.style.visibility = 'visible'
     },
+    deletePlayerDB() {
+      localStorage.removeItem(Config.PLAYER_DB)
+      this.playerDB = {}
+      let pdb = document.getElementById('player-db-information')
+      pdb.style.visibility = 'hidden'
+    },
     showTeamId() {
       console.log('showTeamId')
       if (!this.playerDB) return;
@@ -174,15 +180,12 @@ export default {
 
       let teamHtml = ''
       for (const category in categoryList) {
-        let n = categoryList[category].length
-        let max_team_number_in_row = 5
-        let rowNumber = Math.ceil(n/max_team_number_in_row)
+        let max_character_in_row = 33
         teamHtml += `<div>${category}<div>`
 
         let line = ''
         for (const teamId of categoryList[category]) {
-          console.log(teamId, teamId.length, rowNumber)
-          if (line.length + teamId.length < 33) {
+          if (line.length + teamId.length < max_character_in_row) {
             line += teamId + ' '
           }
           else {
@@ -233,6 +236,12 @@ export default {
           }
           this.players = Players.newPlayers(formations)
           this.saveToLocalStorage()
+        }
+      }
+      if (this.modalType === 'show-team-id') {
+        if (state.type === 'delete') {
+          console.log('delete player db')
+          this.deletePlayerDB()
         }
       }
     },
