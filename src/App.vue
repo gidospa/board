@@ -155,15 +155,10 @@ export default {
       if (!playerDB) return;
 
       this.playerDB = playerDB
-      console.log(this.playerDB.version)
-      let pdb = document.getElementById('player-db-information')
-      pdb.style.visibility = 'visible'
     },
     deletePlayerDB() {
       localStorage.removeItem(Config.PLAYER_DB)
       this.playerDB = {}
-      let pdb = document.getElementById('player-db-information')
-      pdb.style.visibility = 'hidden'
     },
     showTeamId() {
       console.log('showTeamId')
@@ -198,7 +193,7 @@ export default {
 
       // show modal
       this.modalType = 'show-team-id'
-      this.modalParam = {teamHtml}
+      this.modalParam = {teamHtml, version: this.playerDB.version}
       this.showModal = true
     },
     saveField() {

@@ -1,47 +1,52 @@
 <template>
 <div id="member">
-  <div id="player-db-information" @click="$emit('showTeamId')">
-       Player DB {{dbversion}}
-  </div>
-  <div class="member">
-    <input class="team-color" type="color" v-model="homeColor" list="colorList" />
-  </div>
-  <div class="member">
-    <textarea v-model="home" @blur="onBlur()" spellcheck="false"/>
-  </div>
-  <div class="member">
-    <button class="default-button" type="button" onfocus="this.blur()" id="changing-ends" @click="onClickChange">Changing ends</button>
-  </div>
-  <div class="member">
-    <textarea v-model="away" @blur="onBlur()" spellcheck="false"/>
-  </div>
-  <div class="member">
-    <input class="team-color" type="color" v-model="awayColor" list="colorList" />
-  </div>
-  <datalist id="colorList">
-    <option>#000000</option>
-    <option>#ffffff</option>
-    <option>#ff0000</option>
-    <option>#dd3300</option>
-    <option>#ff8000</option>
-    
-    <option>#00cc00</option>
-    <option>#ffcc00</option>
-    <option>#ff0066</option>
-    <option>#cc0044</option>
-    <option>#880011</option>
+  <div draggable="true" @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop.stop.prevent="onDropPlayerDB">
+    <div id="player-db-information">
+      <div :class="{'player-db-information__dragover': isDragOver}">
+        <span class="player-db-information__text" @click="$emit('showTeamId')">Player DB</span>
+      </div>
+    </div>
+    <div class="member">
+      <input class="team-color" type="color" v-model="homeColor" list="colorList" />
+    </div>
+    <div class="member">
+      <textarea v-model="home" @blur="onBlur()" spellcheck="false"/>
+    </div>
+    <div class="member">
+      <button class="default-button" type="button" onfocus="this.blur()" id="changing-ends" @click="onClickChange">Changing ends</button>
+    </div>
+    <div class="member">
+      <textarea v-model="away" @blur="onBlur()" spellcheck="false"/>
+    </div>
+    <div class="member">
+      <input class="team-color" type="color" v-model="awayColor" list="colorList" />
+    </div>
+    <datalist id="colorList">
+      <option>#000000</option>
+      <option>#ffffff</option>
+      <option>#ff0000</option>
+      <option>#dd3300</option>
+      <option>#ff8000</option>
+      
+      <option>#00cc00</option>
+      <option>#ffcc00</option>
+      <option>#ff0066</option>
+      <option>#cc0044</option>
+      <option>#880011</option>
 
-    <option>#006600</option>
-    <option>#113355</option>
-    <option>#8000ff</option>
-    <option>#0000ff</option>
-    <option>#0080ff</option>
-  </datalist>
+      <option>#006600</option>
+      <option>#113355</option>
+      <option>#8000ff</option>
+      <option>#0000ff</option>
+      <option>#0080ff</option>
+    </datalist>
+  </div>
 </div>
 </template>
 
 <script>
 import {dropbox} from '../utils/io.js'
+import { PLAYER_DB } from '../utils/config'
 
 export default {
   props: {
@@ -55,6 +60,8 @@ export default {
       away: '',
       homeColor: '#ff0000',
       awayColor: '#0000ff',
+      playerDBversion: '',
+      isDragOver: false
     }
   },
   methods: {
@@ -85,6 +92,64 @@ export default {
     },
     onClickChange() {
       this.$emit('changeEnds')
+    },
+    onDragOver() {
+      if (!this.playerDBversion) {
+        this.isDragOver = true
+        let pdb = document.getElementById('player-db-information')
+        pdb.style.visibility = 'visible'
+      }
+    },
+    onDragLeave() {
+      this.isDragOver = false
+      if (!this.playerDBversion) {
+        let pdb = document.getElementById('player-db-information')
+        pdb.style.visibility = 'hidden'
+      }
+    },
+    onDropPlayerDB(event) {
+      console.log('drop file:', event.dataTransfer.files)
+      this.onDragLeave()
+      if (this.playerDBversion) {
+        console.log('player db already exists')
+        return
+      }
+
+      const file = event.dataTransfer.files[0]
+      let fileReader = new FileReader()
+      fileReader.onload = () => {
+        try {
+          let playerDB = JSON.parse(fileReader.result)
+          console.log(`version: ${playerDB.version}, teams: ${playerDB.teams}`)          
+          if (playerDB.version && playerDB.teams) {
+            const teams = Object.keys(playerDB.teams)
+            let i = 0;
+            for (i = 0; i < teams.length;i ++) {
+              const team = teams[i]
+              const teamInfo = playerDB.teams[team]
+              if (!teamInfo.nationality || !teamInfo.category || !teamInfo.players) {
+                console.log('playerDB format error:', team)
+                console.log('  nationality:', teamInfo.nationality)
+                console.log('  category:', teamInfo.category)
+                console.log('  players:', teamInfo.players)
+                break
+              }
+            }
+            if (i == teams.length) {
+              console.log('playerDB updated')
+              localStorage.setItem(PLAYER_DB, fileReader.result)
+              this.$emit('loadPlayerDB')
+            }
+          }
+          else {
+            console.log('cannot read playerDB file')          
+          }
+        }
+        catch (e) {
+          console.log(e)
+        }
+      }
+      fileReader.readAsText( file )
     }
   },
   created() {
@@ -113,6 +178,19 @@ export default {
     awayColor: function() {
       this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
     },
+    dbversion: function() {
+      let pdb = document.getElementById('player-db-information')
+      if (this.dbversion) {
+        console.log('playerDB visible')
+        this.playerDBversion = this.dbversion
+        pdb.style.visibility = 'visible'
+      }
+      else {
+        console.log('playerDB hidden')
+        this.playerDBversion = ''
+        pdb.style.visibility = 'hidden'
+      }
+    }
   },
   mounted() {
     dropbox.availablePlayerDB = () => {
@@ -157,9 +235,11 @@ textarea {
   cursor: default;
   visibility: hidden;
 }
-#player-db-information:hover,
-#player-db-information:focus
-{
+.player-db-information__dragover {
+  color: #ddd;
+}
+.player-db-information__text:hover,
+.player-db-information__text:focus {
   color: #ccc;
 }
 </style>

@@ -73,7 +73,8 @@
       </div>
 
       <div class="modal-header">
-        Player DB teams list
+        Player DB teams list<br>
+        {{this.field.version}}
       </div>
       <br>
       <span class="team-id" v-html="field.teamHtml"></span>
