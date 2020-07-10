@@ -46,13 +46,12 @@
 
 <script>
 import {dropbox} from '../utils/io.js'
-import { PLAYER_DB } from '../utils/config'
 
 export default {
   props: {
     members: String,
     colors: String,
-    dbversion: String,
+    playerdb: Object,
   },
   data() {
     return {
@@ -60,7 +59,6 @@ export default {
       away: '',
       homeColor: '#ff0000',
       awayColor: '#0000ff',
-      playerDBversion: '',
       isDragOver: false
     }
   },
@@ -94,7 +92,7 @@ export default {
       this.$emit('changeEnds')
     },
     onDragOver() {
-      if (!this.playerDBversion) {
+      if (!this.playerdb) {
         this.isDragOver = true
         let pdb = document.getElementById('player-db-information')
         pdb.style.visibility = 'visible'
@@ -102,7 +100,7 @@ export default {
     },
     onDragLeave() {
       this.isDragOver = false
-      if (!this.playerDBversion) {
+      if (!this.playerdb) {
         let pdb = document.getElementById('player-db-information')
         pdb.style.visibility = 'hidden'
       }
@@ -110,7 +108,7 @@ export default {
     onDropPlayerDB(event) {
       console.log('drop file:', event.dataTransfer.files)
       this.onDragLeave()
-      if (this.playerDBversion) {
+      if (this.playerdb) {
         console.log('player db already exists')
         return
       }
@@ -137,8 +135,7 @@ export default {
             }
             if (i == teams.length) {
               console.log('playerDB updated')
-              localStorage.setItem(PLAYER_DB, fileReader.result)
-              this.$emit('loadPlayerDB')
+              this.$emit('loadPlayerDB', playerDB)
             }
           }
           else {
@@ -178,16 +175,14 @@ export default {
     awayColor: function() {
       this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
     },
-    dbversion: function() {
+    playerdb: function() {
       let pdb = document.getElementById('player-db-information')
-      if (this.dbversion) {
+      if (this.playerdb) {
         console.log('playerDB visible')
-        this.playerDBversion = this.dbversion
         pdb.style.visibility = 'visible'
       }
       else {
         console.log('playerDB hidden')
-        this.playerDBversion = ''
         pdb.style.visibility = 'hidden'
       }
     }
@@ -211,7 +206,6 @@ textarea {
   max-height: 1024px;
   height: calc( 1.4em * 18 );
   line-height: 1.4;
-  padding: 0;
   vertical-align: bottom;
   font-size: 1rem;
 }

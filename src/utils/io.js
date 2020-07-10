@@ -25,6 +25,15 @@ local.fetch = function(success) {
     this.splice(0) // clear array
     console.log('create new boards at localStorage')
   }
+  
+  // playerDB
+  if (localStorage[PLAYER_DB]) {
+    let playerDB = JSON.parse(localStorage[PLAYER_DB])
+    this.playerDB = playerDB
+  }
+  else {
+    delete this.playerDB
+  }
 
   success && success()
 }
@@ -49,7 +58,17 @@ local.remove = function(n, success) {
   localStorage[FIELD_DATA_LIST] = newBoardsString
   this.fetch(success)
 }
-
+local.savePlayerDB = function(db, success) {
+  let playerDBString = JSON.stringify(db)
+  localStorage.setItem(PLAYER_DB, playerDBString)
+  this.playerDB = db
+  success && success()
+}
+local.deletePlayerDB = function(success) {
+  localStorage.removeItem(PLAYER_DB)
+  delete this.playerDB
+  success && success()
+}
 
 /*================================================================================ 
 ** google drive
@@ -270,6 +289,23 @@ dropbox.downloadPlayerDB = function() {
   }
   Dropbox('files/download', {path: DROPBOX_PLAYER_DB_FILE}, callbacks);
 }
+dropbox.playerDB = {}
+Object.defineProperty(dropbox, 'playerDB', {
+  get() {
+    if (typeof this._playerDB === 'undefined') {
+      this._playerDB = {}
+    }
+    return this._playerDB
+  },
+  set(val) {
+    if (val) {
+      this._playerDB = val
+    }
+    else {
+      this._playerDB = {}
+    }
+  }
+})
 dropbox.startConnecting = null
 dropbox.endConnectig = null
 dropbox.availablePlayerDB = null

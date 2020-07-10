@@ -18,7 +18,7 @@
   <Member
     :members="members"
     :colors="colors"
-    :dbversion="playerDB.version"
+    :playerdb="playerDB"
     @changeMemberList="changeMemberList"
     @changeTeamColors="changeTeamColors"
     @changeEnds="changeEnds"
@@ -63,10 +63,10 @@ export default {
     return {
       colors: Config.TEAM_COLORS,
       players: [],
-      playerDB: {},
       doCapture: {},
       doSave: {},
       storage: [],
+      playerDB: null,
       showModal: false,
       modalType: 'saved-field',
       modalParam: {},
@@ -143,22 +143,13 @@ export default {
       this.saveToLocalStorage()
       console.log('changeEnds')
     },
-    loadPlayerDB() {
-      let playerDB = {}
-      try {
-        playerDB = JSON.parse(localStorage.getItem(Config.PLAYER_DB))
-      }
-      catch (e) {
-        console.log("can't parse player DB")
-        return;
-      }
-      if (!playerDB) return;
-
-      this.playerDB = playerDB
-    },
-    deletePlayerDB() {
-      localStorage.removeItem(Config.PLAYER_DB)
-      this.playerDB = {}
+    loadPlayerDB(playerDB) {
+      console.log('loadPlayerDB')
+      console.log('old:', this.playerDB)
+      this.storage.savePlayerDB(playerDB, () => {
+        this.playerDB = playerDB
+        console.log('new:', this.playerDB)
+      })
     },
     showTeamId() {
       console.log('showTeamId')
@@ -236,7 +227,8 @@ export default {
       if (this.modalType === 'show-team-id') {
         if (state.type === 'delete') {
           console.log('delete player db')
-          this.deletePlayerDB()
+          this.storage.deletePlayerDB()
+          this.playerDB = null
         }
       }
     },
@@ -258,6 +250,7 @@ export default {
     changeStorage(fields) {
       console.log('changeStorage')
       this.storage = fields
+      this.playerDB = fields.playerDB
     },
     captureField() {
       console.log('captured field')
@@ -290,13 +283,6 @@ export default {
 
     if (this.players.length == 0) {
       this.players = Players.newPlayers(null)
-    }
-  },
-  mounted() {
-    let playerDB = JSON.parse(localStorage.getItem(Config.PLAYER_DB))
-    if (playerDB) {
-
-      this.loadPlayerDB()
     }
   },
   watch: {
