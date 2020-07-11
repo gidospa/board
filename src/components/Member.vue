@@ -45,8 +45,6 @@
 </template>
 
 <script>
-import {dropbox} from '../utils/io.js'
-
 export default {
   props: {
     members: String,
@@ -185,11 +183,6 @@ export default {
         console.log('playerDB hidden')
         pdb.style.visibility = 'hidden'
       }
-    }
-  },
-  mounted() {
-    dropbox.availablePlayerDB = () => {
-      this.$emit('loadPlayerDB')
     }
   }
 }

@@ -50,6 +50,7 @@ export default {
         let dbx = document.getElementById('dropbox')
         dbx.classList.remove('connected')
         this.currentStorage = local
+        local.fetch()
         this.$emit('changeStorage', this.currentStorage)
       }
       else {

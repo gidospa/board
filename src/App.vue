@@ -145,10 +145,8 @@ export default {
     },
     loadPlayerDB(playerDB) {
       console.log('loadPlayerDB')
-      console.log('old:', this.playerDB)
       this.storage.savePlayerDB(playerDB, () => {
         this.playerDB = playerDB
-        console.log('new:', this.playerDB)
       })
     },
     showTeamId() {
@@ -227,8 +225,9 @@ export default {
       if (this.modalType === 'show-team-id') {
         if (state.type === 'delete') {
           console.log('delete player db')
-          this.storage.deletePlayerDB()
-          this.playerDB = null
+          this.storage.deletePlayerDB(() => {
+            this.playerDB = null
+          })
         }
       }
     },

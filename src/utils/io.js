@@ -127,13 +127,10 @@ dropbox.fetch = function(success, failure) {
     onComplete: () => {
       console.log('complete dropbox authenticate')
       this.download(success, failure)
-      if (!localStorage.getItem(PLAYER_DB)) {
-        console.log('download player db from dropbox')
-        this.downloadPlayerDB()
-      }
-      else {
-        console.log('player db already exists')
-      }
+      console.log('download player db from dropbox')
+      this.downloadPlayerDB((db) => {
+        this.playerDB = db
+      })
     },
     onError: (e) => {
       console.log('incomplete dropbox authenticate')
@@ -258,21 +255,23 @@ dropbox.upload = function(contents, success, failure) {
   }
   Dropbox('files/upload', param, contents, callbacks)
 }
-dropbox.downloadPlayerDB = function() {
+dropbox.downloadPlayerDB = function(success, failure) {
   let callbacks = {
     onComplete: (result, response) => {
       let reader = new FileReader()
       reader.addEventListener('loadend', () => {
         try {
           let playerDB = JSON.parse(reader.result)
-          let playerDBString = JSON.stringify(playerDB)
           if (playerDB) {
-            localStorage.setItem(PLAYER_DB, playerDBString)
-            this.availablePlayerDB && this.availablePlayerDB(playerDB['version'])
+            success && success(playerDB)
+          }
+          else {
+            failure && failure()
           }
         }
         catch (e) {
           console.log(`cannot parse ${PLAYER_DB}:`, e)
+          failure && failure()
         }
       })
       reader.readAsText(response)
@@ -289,26 +288,43 @@ dropbox.downloadPlayerDB = function() {
   }
   Dropbox('files/download', {path: DROPBOX_PLAYER_DB_FILE}, callbacks);
 }
-dropbox.playerDB = {}
-Object.defineProperty(dropbox, 'playerDB', {
-  get() {
-    if (typeof this._playerDB === 'undefined') {
-      this._playerDB = {}
-    }
-    return this._playerDB
-  },
-  set(val) {
-    if (val) {
-      this._playerDB = val
-    }
-    else {
-      this._playerDB = {}
+dropbox.uploadPlayerDB = function(contents, success, failure) {
+  let param = {
+    path: DROPBOX_PLAYER_DB_FILE,
+    mode: 'overwrite'
+  }
+  let callbacks = {
+    onComplete: () => {this.downloadPlayerDB(success, failure)},
+    onError: (e) => {
+      console.log(e)
+      failure && failure(e)
     }
   }
-})
+  Dropbox('files/upload', param, contents, callbacks)
+}
+dropbox.savePlayerDB = function(db, success, failure) {
+  console.log(db)
+  let playerDBString = JSON.stringify(db)
+  this.uploadPlayerDB(playerDBString, (playerDB) => {
+    this.playerDB = playerDB
+    console.log('upload succeeded')
+    success && success()
+  }, () => {failure && failure()})
+}
+dropbox.deletePlayerDB = function(success, failure) {
+  console.log('deletePlayerDB')
+  this.uploadPlayerDB("", (playerDB) => {
+    // can't delete playerDB
+    console.log('cannot delete playerDB:', playerDB)
+    failure && failure()
+  }, () => {
+    // deleted playerDB
+    delete this.playerDB
+    success && success()  
+  })
+}
 dropbox.startConnecting = null
 dropbox.endConnectig = null
-dropbox.availablePlayerDB = null
 
 /*================================================================================ 
 ** storage template
