@@ -54,7 +54,7 @@ export default {
         this.$emit('changeStorage', this.currentStorage)
       }
       else {
-        console.log('change storage to Dropbox:')
+        console.log('change storage to Dropbox')
         dropbox.fetch(() => {
           console.log('connected to Dropbox')
           this.currentStorage = dropbox

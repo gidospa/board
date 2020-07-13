@@ -82,7 +82,7 @@
       <div class="modal-button">
         <div class="center-button">
           <button class="default-button" @click="$emit('close', {type:'delete'})">
-            DELETE PLAYER DB<br>FROM BROWSER
+            DELETE PLAYER DB
           </button>
         </div>
       </div>

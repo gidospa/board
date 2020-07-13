@@ -249,7 +249,20 @@ export default {
     changeStorage(fields) {
       console.log('changeStorage')
       this.storage = fields
-      this.playerDB = fields.playerDB
+      
+      if (fields.playerDB) {
+        this.playerDB = fields.playerDB
+      }
+      else {
+        if (this.playerDB) {
+          this.storage.savePlayerDB(this.playerDB, () => {
+            console.log('copy playerDB to storage')
+          }, () => {
+            console.log('cannot copy playerDB to storage')
+            this.playerDB = null
+          })
+        }
+      }
     },
     captureField() {
       console.log('captured field')
