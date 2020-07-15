@@ -14,7 +14,7 @@
   <div v-show="isDropboxAvailable" id="dropbox" class="storage-button" @click="dropboxStorage">
     Dropbox
   </div>
-  <div id="google" class="storage-button" @click="googleStorage">
+  <div v-show="isGoogleAvailable" id="google" class="storage-button" @click="googleStorage">
     Google
   </div>
   <div class="storage-button" id="clear-local-storage">
@@ -36,6 +36,7 @@ export default {
     return {
       currentStorage: {},
       isDropboxAvailable: false,
+      isGoogleAvailable: false,
     }
   },
   methods: {
@@ -98,6 +99,19 @@ export default {
       let url = URL.createObjectURL(new Blob([boardString], {type: 'text/play'}))
       download(filename, url)
     },
+  },
+  created() {
+    window.googleInit = () => {
+      console.log('gapi loaded')
+      google.isAvailable()
+        .then((result) => {
+          console.log(result)
+          this.isGoogleAvailable = true
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    }
   },
   mounted() {
     this.currentStorage = local

@@ -79,12 +79,17 @@ local.deletePlayerDB = function(success) {
 const GOOGLE_DRIVE_CLIENT_ID = process.env.VUE_APP_GOOGLE_DRIVE_CLIENT_ID
 
 export const google = []
-google.isAvailable = function() {
+google.isAvailable = async function() {
   if (!GOOGLE_DRIVE_CLIENT_ID) {
-    return 'unavailable'
+    return Promise.reject('unavailable')
   }
-
-  return 'available'
+  await window.gapi.load('client:auth2')
+  await window.gapi.client.init({
+    clientId: GOOGLE_DRIVE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/drive.file'
+  })
+  await window.gapi.client.load('drive', 'v3')
+  return Promise.resolve('available')
 }
 google.fetch = function() {}
 google.appende = function() {}
