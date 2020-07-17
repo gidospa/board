@@ -40,25 +40,52 @@ export default {
     }
   },
   methods: {
-    googleStorage() {
-      console.log('change storage to Google Drive')
-      this.currentStorage = google
-      this.$emit('changeStorage', this.currentStorage)
+    googleStorage(e) {
+      if (e.target.classList.contains('connected')) {
+        console.log('change storage to localStorage')
+        this.currentStorage.disconnect && this.currentStorage.disconnect()
+        this.currentStorage = local
+        local.fetch(() => {
+          this.$emit('changeStorage', this.currentStorage)
+        })
+      }
+      else {
+        console.log('change storage to Google Drive')
+        google.fetch(() => {
+          console.log('connected to Google Drive')
+          this.currentStorage.disconnect && this.currentStorage.disconnect()
+          this.currentStorage = google
+          this.currentStorage.disconnect = function() {
+            let ggl = document.getElementById('google')
+            ggl.classList.remove('connected')
+          }
+          this.$emit('changeStorage', this.currentStorage)
+          const ggl = document.getElementById('google')
+          ggl.classList.add('connected')
+        }, (e) => {
+          console.log('fail to connect to Google Drive:', e)
+        })
+      }
     },
     dropboxStorage(e) {
       if (e.target.classList.contains('connected')) {
         console.log('change storage to localStorage')
-        let dbx = document.getElementById('dropbox')
-        dbx.classList.remove('connected')
+        this.currentStorage.disconnect && this.currentStorage.disconnect()
         this.currentStorage = local
-        local.fetch()
-        this.$emit('changeStorage', this.currentStorage)
+        local.fetch(() => {
+          this.$emit('changeStorage', this.currentStorage)
+        })
       }
       else {
         console.log('change storage to Dropbox')
         dropbox.fetch(() => {
           console.log('connected to Dropbox')
+          this.currentStorage.disconnect && this.currentStorage.disconnect()
           this.currentStorage = dropbox
+          this.currentStorage.disconnect = function() {
+            let dbx = document.getElementById('dropbox')
+            dbx.classList.remove('connected')
+          }
           this.$emit('changeStorage', this.currentStorage)
           let dbx = document.getElementById('dropbox')
           dbx.classList.add('connected')
@@ -146,6 +173,16 @@ export default {
         console.log('fail to connect to Dropbox:', e)
       })
       break
+    }
+
+    // initialize Google
+    google.startConnecting = function() {
+      let dbx = document.getElementById('google')
+      dbx.classList.add('connecting')
+    }
+    google.endConnecting = function() {
+      let dbx = document.getElementById('google')
+      dbx.classList.remove('connecting')
     }
   }
 }

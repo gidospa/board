@@ -1,5 +1,6 @@
 import {FIELD_DATA_LIST, PLAYER_DB, EXPORT_FILE_NAME_PREFIX, PLAYER_DB_FILE_PREFIX} from './config.js'
 import Dropbox from './dropbox.js'
+import Google from './google.js'
 
 /*================================================================================ 
 ** localStorge
@@ -74,9 +75,10 @@ local.deletePlayerDB = function(success) {
 ** google drive
 **
 ** /.env
-**   VUE_APP_GOOGLE_DRIVE_CLIENT_ID = 'DropboxMyappsAppkey';
+**   VUE_APP_GOOGLE_DRIVE_CLIENT_ID = 'GoogleDriveMyClientID';
 **==============================================================================*/
 const GOOGLE_DRIVE_CLIENT_ID = process.env.VUE_APP_GOOGLE_DRIVE_CLIENT_ID
+const GOOGLE_FIELD_FILE = `${EXPORT_FILE_NAME_PREFIX}.json`
 
 export const google = []
 google.isAvailable = async function() {
@@ -91,9 +93,74 @@ google.isAvailable = async function() {
   await window.gapi.client.load('drive', 'v3')
   return Promise.resolve('available')
 }
-google.fetch = function() {}
-google.appende = function() {}
-google.remove = function() {}
+google.fetch = async function(success, failure) {
+  this.startConnecting && this.startConnecting()
+
+  if (!window.gapi.auth2.getAuthInstance().isSignedIn.get()) {
+    try {
+      await window.gapi.auth2.getAuthInstance().signIn()
+    }
+    catch (e) {
+      console.error(e.error)
+      this.endConnecting && this.endConnecting()
+      failure && failure()
+      return
+    }
+  }
+    
+  if (window.gapi.auth2.getAuthInstance().isSignedIn.get()) {
+    const boardsString = await Google.download(GOOGLE_FIELD_FILE)
+    const boards = JSON.parse(boardsString)
+    if (boards) {
+      this.splice(0)
+      Array.prototype.push.apply(this, boards)
+      this.endConnecting && this.endConnecting()        
+      success && success()
+      return
+    }
+  }
+  this.endConnecting && this.endConnecting()  
+  failure && failure()
+}
+google.appende = async function(board, success, failure) {
+  this.startConnecting && this.startConnecting()
+  const newBoards = [board].concat(this)
+
+  const newBoardsString = JSON.stringify(newBoards)
+  await Google.upload(GOOGLE_FIELD_FILE, newBoardsString)
+  const boardsString = await Google.download(GOOGLE_FIELD_FILE)
+  const boards = JSON.parse(boardsString)
+  if (boards) {
+    this.splice(0)
+    Array.prototype.push.apply(this, boards)
+    this.endConnecting && this.endConnecting()
+    success && success()
+    return
+  }
+  this.endConnecting && this.endConnecting()
+  failure && failure()
+}
+google.remove = async function(n, success, failure) {
+  this.startConnecting && this.startingConnecting()
+  let newBoards = [].concat(this) // copy array
+  newBoards.splice(n, 1) // remove a element at index n
+
+  const newBoardsString = JSON.stringify(newBoards)
+  await Google.upload(GOOGLE_FIELD_FILE, newBoardsString)
+  const boardsString = await Google.download(GOOGLE_FIELD_FILE)
+  const boards = JSON.parse(boardsString)
+  if (boards) {
+    this.splice(0)
+    Array.prototype.push.apply(this, boards)
+    this.endConnecting && this.endConnecting()
+    success && success()
+    return
+  }
+  this.endConnecting && this.endConnecting()
+  failure && failure()
+}
+google.startConnecting = null
+google.endConnecting = null
 
 
 /*================================================================================ 
@@ -329,7 +396,7 @@ dropbox.deletePlayerDB = function(success, failure) {
   })
 }
 dropbox.startConnecting = null
-dropbox.endConnectig = null
+dropbox.endConnecting = null
 
 /*================================================================================ 
 ** storage template
