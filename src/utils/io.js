@@ -79,19 +79,29 @@ local.deletePlayerDB = function(success) {
 **==============================================================================*/
 const GOOGLE_DRIVE_CLIENT_ID = process.env.VUE_APP_GOOGLE_DRIVE_CLIENT_ID
 const GOOGLE_FIELD_FILE = `${EXPORT_FILE_NAME_PREFIX}.json`
+const GOOGLE_PLAYER_DB_FILE = `${PLAYER_DB_FILE_PREFIX}.json`
 
 export const google = []
-google.isAvailable = async function() {
+google.isAvailable = function(available, unavailable) {
   if (!GOOGLE_DRIVE_CLIENT_ID) {
-    return Promise.reject('unavailable')
+    return 'unavailable'
   }
-  await window.gapi.load('client:auth2')
-  await window.gapi.client.init({
-    clientId: GOOGLE_DRIVE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/drive.file'
+  window.gapi.load('client:auth2',() => {
+    window.gapi.client.init({
+      clientId: GOOGLE_DRIVE_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/drive.file'
+    })
+    .then(
+      window.gapi.client.load('drive', 'v3')
+    )
+    .then(() => {
+      available && available()
+    })
+    .catch((e) => {
+      console.log('Google Drive is not available:', e)
+      unavailable && unavailable()
+    })
   })
-  await window.gapi.client.load('drive', 'v3')
-  return Promise.resolve('available')
 }
 google.fetch = async function(success, failure) {
   this.startConnecting && this.startConnecting()
@@ -107,22 +117,48 @@ google.fetch = async function(success, failure) {
       return
     }
   }
-    
+  
   if (window.gapi.auth2.getAuthInstance().isSignedIn.get()) {
-    const boardsString = await Google.download(GOOGLE_FIELD_FILE)
-    const boards = JSON.parse(boardsString)
-    if (boards) {
-      this.splice(0)
-      Array.prototype.push.apply(this, boards)
-      this.endConnecting && this.endConnecting()        
-      success && success()
-      return
+    try {
+      let boardsString = await Google.download(GOOGLE_FIELD_FILE)
+      if (boardsString == null) {
+        await Google.upload(GOOGLE_FIELD_FILE, '[]')
+        boardsString = await Google.download(GOOGLE_FIELD_FILE)
+      }
+      const boards = JSON.parse(boardsString)
+      if (boards) {
+        this.splice(0)
+        Array.prototype.push.apply(this, boards)
+        success && success()
+      }
+      else {
+        console.log('cannot download or create field file')
+        failure && failure()
+      }
+    }
+    catch (e) {
+      console.log(e)
+      failure && failure()
+    }
+
+    try {
+      const playerDBString = await Google.download(GOOGLE_PLAYER_DB_FILE)
+      const playerDB = JSON.parse(playerDBString)
+      if (playerDB) {
+        this.playerDB = playerDB
+      }
+      else {
+        console.log('cannot download player DB')
+      } 
+    }
+    catch (e) {
+      console.log(e)
     }
   }
+
   this.endConnecting && this.endConnecting()  
-  failure && failure()
 }
-google.appende = async function(board, success, failure) {
+google.append = async function(board, success, failure) {
   this.startConnecting && this.startConnecting()
   const newBoards = [board].concat(this)
 
@@ -141,7 +177,7 @@ google.appende = async function(board, success, failure) {
   failure && failure()
 }
 google.remove = async function(n, success, failure) {
-  this.startConnecting && this.startingConnecting()
+  this.startConnecting && this.startConnecting()
   let newBoards = [].concat(this) // copy array
   newBoards.splice(n, 1) // remove a element at index n
 
@@ -159,6 +195,37 @@ google.remove = async function(n, success, failure) {
   this.endConnecting && this.endConnecting()
   failure && failure()
 }
+google.savePlayerDB = async function(playerDB, success, failure) {
+  this.startConnecting && this.startConnecting()
+
+  try {
+    const playerDBString = JSON.stringify(playerDB)
+    await Google.upload(GOOGLE_PLAYER_DB_FILE, playerDBString)
+    this.playerDB = playerDB
+    success && success()  
+  }
+  catch (e) {
+    console.log(e)
+    failure && failure()
+  }
+
+  this.endConnecting && this.endConnecting()
+}
+google.deletePlayerDB = async function(success, failure) {
+  this.startConnecting && this.startConnecting()
+
+  try {
+    await Google.delete(GOOGLE_PLAYER_DB_FILE)
+    delete this.playerDB
+    success && success()
+  }
+  catch (e) {
+    console.log(e)
+    failure && failure
+  }
+
+  this.endConnecting && this.endConnecting()
+}
 google.startConnecting = null
 google.endConnecting = null
 
@@ -169,9 +236,9 @@ google.endConnecting = null
 ** /.env
 **   VUE_APP_DROPBOX_CLIENT_ID = 'DropboxMyappsAppkey';
 **==============================================================================*/
-const  DROPBOX_CLIENT_ID = process.env.VUE_APP_DROPBOX_CLIENT_ID
-const  DROPBOX_FIELD_FILE = `/${EXPORT_FILE_NAME_PREFIX}.json`
-const  DROPBOX_PLAYER_DB_FILE = `/${PLAYER_DB_FILE_PREFIX}.json`
+const DROPBOX_CLIENT_ID = process.env.VUE_APP_DROPBOX_CLIENT_ID
+const DROPBOX_FIELD_FILE = `/${EXPORT_FILE_NAME_PREFIX}.json`
+const DROPBOX_PLAYER_DB_FILE = `/${PLAYER_DB_FILE_PREFIX}.json`
 
 export const dropbox = []
 dropbox.isAvailable = function() {

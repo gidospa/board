@@ -130,14 +130,11 @@ export default {
   created() {
     window.googleInit = () => {
       console.log('gapi loaded')
-      google.isAvailable()
-        .then((result) => {
-          console.log(result)
+      google.isAvailable(() => {
           this.isGoogleAvailable = true
-        })
-        .catch((e) => {
-          console.log(e)
-        })
+      }, () => {
+          this.isGoogleAvailable = false
+      })
     }
   },
   mounted() {
