@@ -59,6 +59,16 @@ local.remove = function(n, success) {
   localStorage[FIELD_DATA_LIST] = newBoardsString
   this.fetch(success)
 }
+local.clear = function() {
+  const boardString = JSON.stringify({
+    timestamp: new Date().getTime(),
+    boardStorage: []
+  })
+  localStorage[FIELD_DATA_LIST] = boardString
+  this.splice(0)
+  localStorage.removeItem(PLAYER_DB)
+  delete this.playerDB
+}
 local.savePlayerDB = function(db, success) {
   let playerDBString = JSON.stringify(db)
   localStorage.setItem(PLAYER_DB, playerDBString)
@@ -226,6 +236,7 @@ google.deletePlayerDB = async function(success, failure) {
 
   this.endConnecting && this.endConnecting()
 }
+google.clearAccesskey = Google.clear
 google.startConnecting = null
 google.endConnecting = null
 
@@ -462,6 +473,7 @@ dropbox.deletePlayerDB = function(success, failure) {
     success && success()  
   })
 }
+dropbox.clearAccesskey = Dropbox.clear
 dropbox.startConnecting = null
 dropbox.endConnecting = null
 

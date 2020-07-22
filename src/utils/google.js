@@ -71,3 +71,6 @@ google.delete = async function(filename) {
   delete this.fileId[filename]
   return res
 }
+google.clear = function() {
+  window.gapi.auth2.getAuthInstance().disconnect()
+}

@@ -4,10 +4,13 @@
     :capture="capture"
     :storage="storage"
     :exportFieldData="exportFieldData"
+    :clearBoardList="clearBoardList"
+    :clearAccesskey="clearAccesskey"
     @changeStorage="changeStorage" 
     @captureField="captureField"
     @importField="importField"
-    @exportField="exportField">
+    @exportField="exportField"
+    @clearLocalStorage="clearLocalStorage">
   </Storage>
   <Files
     :storage="storage"
@@ -72,6 +75,8 @@ export default {
       modalParam: {},
       capture: {image: ''},
       exportFieldData: {},
+      clearBoardList: {},
+      clearAccesskey: {},
     }
   },
   methods: {
@@ -230,6 +235,22 @@ export default {
           })
         }
       }
+      if (this.modalType === 'clear-localstorage') {
+        if (state.type === 'clear') {
+          for (let i = 0; i < state.items.length; i++) {
+            if (state.items[i] === 'board-list') {
+              console.log('clear board list')
+              this.clearBoardList = {}
+              this.playerDB = null
+              delete localStorage.lastField
+            }
+            if (state.items[i] === 'accesskey') {
+              console.log('clear access key')
+              this.clearAccesskey = {}
+            }
+          }
+        }
+      }
     },
     onClickIcon(index) {
       console.log(index)
@@ -278,6 +299,11 @@ export default {
     exportField() {
       console.log('export filed')
       this.exportFieldData = {version: Config.VERSION, players: this.players, color: this.colors}
+    },
+    clearLocalStorage() {
+      console.log('claer localStorage')
+      this.modalType = 'clear-localstorage'
+      this.showModal = true
     }
   },
   created() {

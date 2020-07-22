@@ -88,6 +88,36 @@
       </div>
     </div>
 
+    
+    <div class="modal-container" v-if="type == 'clear-localstorage'">
+      <div class="modal-close">
+        <div><span @click="$emit('close', {type:'close'})">&times;</span></div>
+      </div>
+      <div class="modal-header">
+        Clear browser data<br>
+        (localStorage and cookie)
+      </div>
+      <div class='modal-checkbox'>
+        <input type="checkbox" id="all-board-list" name="all-board-list" value="board-list" v-model="checkedItems">
+        <label for="all-board-list">Clear all board list</label><br>
+        <input type="checkbox" id="all-storage-accesskey" name="all-storage-accesskey" value="accesskey" v-model="checkedItems">
+        <label for="all-storage-accesskey">Clear storage access keys</label><br>
+      </div>
+      <div>Are you sure?</div>
+      <div class="modal-button">
+        <div class="left-button">
+          <button class="default-button" @click="$emit('close', {type:'clear', items:checkedItems})">
+            YES
+          </button>
+        </div>
+        <div class="right-button">
+          <button class="default-button" @click="$emit('close', {type:'close'})">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -102,7 +132,8 @@ export default {
   data() {
     return {
       formations: FORMATIONS,
-      selected: {home: 0, away: 0}
+      selected: {home: 0, away: 0},
+      checkedItems: []
     }
   },
   methods: {
@@ -175,7 +206,11 @@ export default {
     color: #000;
     text-decoration: none;
 }
-
+.modal-checkbox {
+    margin: 1rem auto;
+    text-align: left;
+    width: 256px;
+}
 
 .formation-list {
     display: inline-block;

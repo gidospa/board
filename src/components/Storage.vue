@@ -17,7 +17,7 @@
   <div v-show="isGoogleAvailable" id="google" class="storage-button" @click="googleStorage">
     Google
   </div>
-  <div class="storage-button" id="clear-local-storage">
+  <div class="storage-button" id="clear-local-storage" @click="$emit('clearLocalStorage')">
     Clear
   </div>
 </div>
@@ -31,6 +31,8 @@ export default {
   props: {
     capture: Object,
     exportFieldData: Object,
+    clearBoardList: Object,
+    clearAccesskey: Object,
   },
   data: function() {
     return {
@@ -126,6 +128,15 @@ export default {
       let url = URL.createObjectURL(new Blob([boardString], {type: 'text/play'}))
       download(filename, url)
     },
+    clearBoardList: function() {
+      console.log('clear board list on localStorage')
+      local.clear()
+    },
+    clearAccesskey: function() {
+      console.log('clear access key')
+      dropbox.clearAccesskey()
+      google.clearAccesskey()
+    }
   },
   created() {
     window.googleInit = () => {
@@ -162,7 +173,12 @@ export default {
       this.isDropboxAvailable = true
       dropbox.fetch(() => {
         console.log('connected to Dropbox')
+        this.currentStorage.disconnect && this.currentStorage.disconnect()
         this.currentStorage = dropbox
+        this.currentStorage.disconnect = function() {
+          let dbx = document.getElementById('dropbox')
+          dbx.classList.remove('connected')
+        }
         this.$emit('changeStorage', this.currentStorage)
         let dbx = document.getElementById('dropbox')
         dbx.classList.add('connected')
