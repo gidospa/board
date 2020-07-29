@@ -4,10 +4,10 @@
     <label for="import-board">Import</label>
     <input id="import-board" type="file" accept="text/plain, application/json" style="display:none" @change="onImport">
   </div>
-  <div class="storage-button" @click="$emit('exportField')">
+  <div class="storage-button" @click="$emit('exportBoard')">
     Export
   </div>
-  <div class="storage-button" @click="$emit('captureField')">
+  <div class="storage-button" @click="$emit('captureBoard')">
     Capture
   </div>
   <span class="blank">&nbsp;</span>
@@ -30,7 +30,7 @@ import {local, google, dropbox, getDatetime, download} from '../utils/io.js'
 export default {
   props: {
     capture: Object,
-    exportFieldData: Object,
+    exportBoardData: Object,
     clearBoardList: Object,
     clearAccesskey: Object,
   },
@@ -97,22 +97,22 @@ export default {
       }
     },
     onImport(e) {
-      const fieldFile = e.target.files[0]
+      const boardFile = e.target.files[0]
       e.target.value = '' // fire when same file is selected next time
 
       let reader = new FileReader()
       reader.addEventListener('load', () => {
         try {
-          let field = JSON.parse(reader.result)
-          if (field) {
-            this.$emit('importField', {players:field.players, color:field.color})
+          let board = JSON.parse(reader.result)
+          if (board) {
+            this.$emit('importBoard', {players:board.players, color:board.color})
           }
         }
         catch (e) {
           console.error(e)
         }
       })
-      reader.readAsText(fieldFile)
+      reader.readAsText(boardFile)
     },
   },
   watch: {
@@ -122,9 +122,9 @@ export default {
 
       download(filename, this.capture.image)
     },
-    exportFieldData: function() {
+    exportBoardData: function() {
       let filename = EXPORT_FILE_NAME_PREFIX + getDatetime() + '.txt'
-      let boardString = JSON.stringify(this.exportFieldData)
+      let boardString = JSON.stringify(this.exportBoardData)
       let url = URL.createObjectURL(new Blob([boardString], {type: 'text/play'}))
       download(filename, url)
     },

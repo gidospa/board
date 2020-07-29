@@ -55,7 +55,7 @@ google.upload = async function(filename, contents) {
 google.create = async function(filename) {
   let res = await window.gapi.client.drive.files.create({
     name: filename,
-    description: 'field list for board app'
+    description: 'board list for board app'
   })
   return res.result.id
 }

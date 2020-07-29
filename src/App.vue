@@ -3,20 +3,20 @@
   <Storage
     :capture="capture"
     :storage="storage"
-    :exportFieldData="exportFieldData"
+    :exportBoardData="exportBoardData"
     :clearBoardList="clearBoardList"
     :clearAccesskey="clearAccesskey"
     @changeStorage="changeStorage" 
-    @captureField="captureField"
-    @importField="importField"
-    @exportField="exportField"
+    @captureBoard="captureBoard"
+    @importBoard="importBoard"
+    @exportBoard="exportBoard"
     @clearLocalStorage="clearLocalStorage">
   </Storage>
   <Files
     :storage="storage"
-    @saveField="saveField"
+    @saveBoard="saveBoard"
     @clickIcon="onClickIcon"
-    @openNewField="openNewField">
+    @openNewBoard="openNewBoard">
   </Files>
   <Member
     :members="members"
@@ -28,7 +28,7 @@
     @showTeamId="showTeamId"
     @loadPlayerDB="loadPlayerDB">
   </Member>
-  <Field 
+  <Board 
     :colors="colors"
     :save="doSave"
     :capture="doCapture"
@@ -38,13 +38,13 @@
     @changeTeamColors="changeTeamColors"
     @doneSave="doneSave"
     @doneCapture="doneCapture">
-  </Field>
-  <Modal v-if="showModal" @close="closeModal" :type="modalType" :field="modalParam"></Modal>
+  </Board>
+  <Modal v-if="showModal" @close="closeModal" :type="modalType" :board="modalParam"></Modal>
 </div>
 </template>
 
 <script>
-import Field from './components/Field.vue'
+import Board from './components/Board.vue'
 import Member from './components/Member.vue'
 import Files from './components/Files.vue'
 import Storage from './components/Storage.vue'
@@ -56,7 +56,7 @@ import {rgba2hex, hex2rgba} from './utils/color.js'
 export default {
   name: 'App',
   components: {
-    Field,
+    Board,
     Member,
     Files,
     Storage,
@@ -71,10 +71,10 @@ export default {
       storage: [],
       playerDB: null,
       showModal: false,
-      modalType: 'saved-field',
+      modalType: 'saved-board',
       modalParam: {},
       capture: {image: ''},
-      exportFieldData: {},
+      exportBoardData: {},
       clearBoardList: {},
       clearAccesskey: {},
     }
@@ -190,18 +190,18 @@ export default {
       this.modalParam = {teamHtml, version: this.playerDB.version}
       this.showModal = true
     },
-    saveField() {
+    saveBoard() {
       console.log('saved filed')
-      this.doSave = {} // fire method in Field.vue
+      this.doSave = {} // fire method in Board.vue
     },
-    doneSave(field) {
-      this.storage.append(field)
+    doneSave(board) {
+      this.storage.append(board)
     },
     closeModal(state) {
       this.showModal = false
       console.log('close modal')
 
-      if (this.modalType === 'saved-field') {
+      if (this.modalType === 'saved-board') {
         if (state.type === 'delete') {
           this.storage.remove(state.index)
         }
@@ -210,7 +210,7 @@ export default {
           this.colors = rgba2hex(this.storage[state.index].color)          
         }
       }
-      if (this.modalType === 'open-new-field') {
+      if (this.modalType === 'open-new-board') {
         if (state.type === 'open') {
           let formations = []
           for (const team of ['home', 'away']) {
@@ -254,25 +254,25 @@ export default {
     },
     onClickIcon(index) {
       console.log(index)
-      this.modalType = 'saved-field'
+      this.modalType = 'saved-board'
       this.modalParam = {index, icon:this.storage[index].icon, timestamp:this.storage[index].timestamp}
       this.showModal = true
     },
-    openNewField() {
-      console.log("openNewfield")
-      this.modalType = 'open-new-field'
+    openNewBoard() {
+      console.log("openNewBoard")
+      this.modalType = 'open-new-board'
 
       let c = this.colors.split(',')
       this.modalParam = {homeColor:c[0], awayColor:c[1]}
       
       this.showModal = true
     },
-    changeStorage(fields) {
+    changeStorage(boards) {
       console.log('changeStorage')
-      this.storage = fields
+      this.storage = boards
       
-      if (fields.playerDB) {
-        this.playerDB = fields.playerDB
+      if (boards.playerDB) {
+        this.playerDB = boards.playerDB
       }
       else {
         if (this.playerDB) {
@@ -285,20 +285,20 @@ export default {
         }
       }
     },
-    captureField() {
-      console.log('captured field')
-      this.doCapture = {} // fire method in Field.vue
+    captureBoard() {
+      console.log('captured board')
+      this.doCapture = {} // fire method in Board.vue
     },
     doneCapture(image) {
       this.capture = {image}
     },
-    importField(field) {
-      this.players = field.players
-      this.colors = field.color
+    importBoard(board) {
+      this.players = board.players
+      this.colors = board.color
     },
-    exportField() {
+    exportBoard() {
       console.log('export filed')
-      this.exportFieldData = {version: Config.VERSION, players: this.players, color: this.colors}
+      this.exportBoardData = {version: Config.VERSION, players: this.players, color: this.colors}
     },
     clearLocalStorage() {
       console.log('claer localStorage')

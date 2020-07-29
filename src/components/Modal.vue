@@ -2,31 +2,31 @@
   <div id="modal-dialog">
     <div class="dialog-overlay"></div>
     
-    <div class="modal-container" v-if="type == 'saved-field'">
+    <div class="modal-container" v-if="type == 'saved-board'">
       <div class="modal-close">
         <div><span @click="$emit('close', {type:'close'})">&times;</span></div>
       </div>
 
       <div class="modal-header">
-        {{ field.timestamp }}
+        {{ board.timestamp }}
       </div>
 
       <div>
-        <img :src="field.icon"/>
+        <img :src="board.icon"/>
       </div>
 
       <div class="modal-button">
         <div class="left-button">
-          <button class="default-button" @click="$emit('close', {type:'open', index:field.index})">Open</button>
+          <button class="default-button" @click="$emit('close', {type:'open', index:board.index})">Open</button>
         </div>
         <div class="right-button">
-          <button class="default-button" @click="$emit('close', {type:'delete', index:field.index})">Delete</button>
+          <button class="default-button" @click="$emit('close', {type:'delete', index:board.index})">Delete</button>
         </div>
       </div>
     </div>
 
 
-    <div class="modal-container" v-if="type == 'open-new-field'">
+    <div class="modal-container" v-if="type == 'open-new-board'">
       <div class="modal-close">
         <div><span @click="$emit('close', {type:'close'})">&times;</span></div>
       </div>
@@ -38,7 +38,7 @@
       
       <div class="select-formation">
         <div class="formation-list" id="left-team">
-          <div><span :style="{color: field.homeColor}">&#x25CF;&nbsp;</span>HOME</div>
+          <div><span :style="{color: board.homeColor}">&#x25CF;&nbsp;</span>HOME</div>
           <div class="formation"
                v-for="(formation, index) in formations"
                :key="'home'+index"
@@ -48,7 +48,7 @@
           </div>
         </div>
         <div class="formation-list" id="right-team">
-          <div><span :style="{color: field.awayColor}">&#x25CF;&nbsp;</span>AWAY</div>
+          <div><span :style="{color: board.awayColor}">&#x25CF;&nbsp;</span>AWAY</div>
           <div class="formation"
                v-for="(formation, index) in formations"
                :key="'away'+index"
@@ -74,10 +74,10 @@
 
       <div class="modal-header">
         Player DB teams list<br>
-        {{this.field.version}}
+        {{this.board.version}}
       </div>
       <br>
-      <span class="team-id" v-html="field.teamHtml"></span>
+      <span class="team-id" v-html="board.teamHtml"></span>
       
       <div class="modal-button">
         <div class="center-button">
@@ -127,7 +127,7 @@ import {FORMATIONS} from '../utils/config.js'
 export default {
   props: {
     type: String,
-    field: Object
+    board: Object
   },
   data() {
     return {

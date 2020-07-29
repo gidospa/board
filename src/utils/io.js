@@ -1,4 +1,4 @@
-import {FIELD_DATA_LIST, PLAYER_DB, EXPORT_FILE_NAME_PREFIX, PLAYER_DB_FILE_PREFIX} from './config.js'
+import {BOARD_LIST, OLD_BOARD_LIST, PLAYER_DB, EXPORT_FILE_NAME_PREFIX, PLAYER_DB_FILE_PREFIX} from './config.js'
 import Dropbox from './dropbox.js'
 import Google from './google.js'
 
@@ -11,8 +11,12 @@ local.isAvailable = function() {
 }
 local.fetch = function(success) {
   console.log('load from localStorage')
-  if (FIELD_DATA_LIST in localStorage) {
-    let bds = JSON.parse(localStorage[FIELD_DATA_LIST])
+  if (OLD_BOARD_LIST in localStorage) {  //  convert old list
+    localStorage[BOARD_LIST] = localStorage[OLD_BOARD_LIST]
+    delete localStorage[OLD_BOARD_LIST]
+  }
+  if (BOARD_LIST in localStorage) {
+    let bds = JSON.parse(localStorage[BOARD_LIST])
     this.splice(0) // clear array
     Array.prototype.push.apply(this, bds.boardStorage)
     console.log('load boards from localStorage')
@@ -22,7 +26,7 @@ local.fetch = function(success) {
       timestamp: new Date().getTime(),
       boardStorage: [],
     })
-    localStorage[FIELD_DATA_LIST] = boardString
+    localStorage[BOARD_LIST] = boardString
     this.splice(0) // clear array
     console.log('create new boards at localStorage')
   }
@@ -45,7 +49,7 @@ local.append = function(board, success) {
     timestamp: new Date().getTime(),
     boardStorage: newBoards
   })
-  localStorage[FIELD_DATA_LIST] = newBoardsString
+  localStorage[BOARD_LIST] = newBoardsString
   this.fetch(success)
 }
 local.remove = function(n, success) {
@@ -56,7 +60,7 @@ local.remove = function(n, success) {
     timestamp: new Date().getTime(),
     boardStorage: newBoards
   })
-  localStorage[FIELD_DATA_LIST] = newBoardsString
+  localStorage[BOARD_LIST] = newBoardsString
   this.fetch(success)
 }
 local.clear = function() {
@@ -64,7 +68,7 @@ local.clear = function() {
     timestamp: new Date().getTime(),
     boardStorage: []
   })
-  localStorage[FIELD_DATA_LIST] = boardString
+  localStorage[BOARD_LIST] = boardString
   this.splice(0)
   localStorage.removeItem(PLAYER_DB)
   delete this.playerDB
@@ -88,7 +92,7 @@ local.deletePlayerDB = function(success) {
 **   VUE_APP_GOOGLE_DRIVE_CLIENT_ID = 'GoogleDriveMyClientID';
 **==============================================================================*/
 const GOOGLE_DRIVE_CLIENT_ID = process.env.VUE_APP_GOOGLE_DRIVE_CLIENT_ID
-const GOOGLE_FIELD_FILE = `${EXPORT_FILE_NAME_PREFIX}.json`
+const GOOGLE_BOARD_FILE = `${EXPORT_FILE_NAME_PREFIX}.json`
 const GOOGLE_PLAYER_DB_FILE = `${PLAYER_DB_FILE_PREFIX}.json`
 
 export const google = []
@@ -130,10 +134,10 @@ google.fetch = async function(success, failure) {
   
   if (window.gapi.auth2.getAuthInstance().isSignedIn.get()) {
     try {
-      let boardsString = await Google.download(GOOGLE_FIELD_FILE)
+      let boardsString = await Google.download(GOOGLE_BOARD_FILE)
       if (boardsString == null) {
-        await Google.upload(GOOGLE_FIELD_FILE, '[]')
-        boardsString = await Google.download(GOOGLE_FIELD_FILE)
+        await Google.upload(GOOGLE_BOARD_FILE, '[]')
+        boardsString = await Google.download(GOOGLE_BOARD_FILE)
       }
       const boards = JSON.parse(boardsString)
       if (boards) {
@@ -142,7 +146,7 @@ google.fetch = async function(success, failure) {
         success && success()
       }
       else {
-        console.log('cannot download or create field file')
+        console.log('cannot download or create board file')
         failure && failure()
       }
     }
@@ -173,8 +177,8 @@ google.append = async function(board, success, failure) {
   const newBoards = [board].concat(this)
 
   const newBoardsString = JSON.stringify(newBoards)
-  await Google.upload(GOOGLE_FIELD_FILE, newBoardsString)
-  const boardsString = await Google.download(GOOGLE_FIELD_FILE)
+  await Google.upload(GOOGLE_BOARD_FILE, newBoardsString)
+  const boardsString = await Google.download(GOOGLE_BOARD_FILE)
   const boards = JSON.parse(boardsString)
   if (boards) {
     this.splice(0)
@@ -192,8 +196,8 @@ google.remove = async function(n, success, failure) {
   newBoards.splice(n, 1) // remove a element at index n
 
   const newBoardsString = JSON.stringify(newBoards)
-  await Google.upload(GOOGLE_FIELD_FILE, newBoardsString)
-  const boardsString = await Google.download(GOOGLE_FIELD_FILE)
+  await Google.upload(GOOGLE_BOARD_FILE, newBoardsString)
+  const boardsString = await Google.download(GOOGLE_BOARD_FILE)
   const boards = JSON.parse(boardsString)
   if (boards) {
     this.splice(0)
@@ -248,7 +252,7 @@ google.endConnecting = null
 **   VUE_APP_DROPBOX_CLIENT_ID = 'DropboxMyappsAppkey';
 **==============================================================================*/
 const DROPBOX_CLIENT_ID = process.env.VUE_APP_DROPBOX_CLIENT_ID
-const DROPBOX_FIELD_FILE = `/${EXPORT_FILE_NAME_PREFIX}.json`
+const DROPBOX_BOARD_FILE = `/${EXPORT_FILE_NAME_PREFIX}.json`
 const DROPBOX_PLAYER_DB_FILE = `/${PLAYER_DB_FILE_PREFIX}.json`
 
 export const dropbox = []
@@ -318,7 +322,7 @@ dropbox.download = function(success, failure) {
       }
     }
   }
-  Dropbox('files/download', {path: DROPBOX_FIELD_FILE}, callbacks);
+  Dropbox('files/download', {path: DROPBOX_BOARD_FILE}, callbacks);
 }
 dropbox.loadBoard = function(result, response, success, failure) {
   let reader = new FileReader()
@@ -334,7 +338,7 @@ dropbox.loadBoard = function(result, response, success, failure) {
       }
       else {
         self.endConnecting && self.endConnecting()
-        failure && failure(`parsing ${DROPBOX_FIELD_FILE} failed`)
+        failure && failure(`parsing ${DROPBOX_BOARD_FILE} failed`)
       }
     }
     catch (e) {
@@ -349,7 +353,7 @@ dropbox.createNewFile = function(success, failure) {
   console.log('create New boards file')
   let emptyString = '[]'
   let param = {
-    path: DROPBOX_FIELD_FILE,
+    path: DROPBOX_BOARD_FILE,
     mode: 'overwrite'
   }
   let callbacks = {
@@ -357,7 +361,7 @@ dropbox.createNewFile = function(success, failure) {
       this.download(success, failure)
     },
     onError: (e) => {
-      console.log(`cannot create ${DROPBOX_FIELD_FILE}`)
+      console.log(`cannot create ${DROPBOX_BOARD_FILE}`)
       failure && failure(e)
       this.endConnecting && this.endConnecting()
     }
@@ -393,7 +397,7 @@ dropbox.remove = function(n, success, failure) {
 }
 dropbox.upload = function(contents, success, failure) {
   let param = {
-    path: DROPBOX_FIELD_FILE,
+    path: DROPBOX_BOARD_FILE,
     mode: 'overwrite'
   }
   let callbacks = {

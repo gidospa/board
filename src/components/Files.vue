@@ -1,9 +1,9 @@
 <template>
 <div id="files">
-  <div class="icon" id="append-mark" @click="$emit('saveField')">+</div>
-  <div class="icon" id="open-new-field" @click="$emit('openNewField')">New</div>
-  <div id="saved-field-icon">
-    <img class="icon" v-for="(field, index) in fieldStorage" :key="field.timestamp+index" :src="field.icon" @click="onClickIcon(index)"/>
+  <div class="icon" id="append-mark" @click="$emit('saveBoard')">+</div>
+  <div class="icon" id="open-new-board" @click="$emit('openNewBoard')">New</div>
+  <div id="saved-board-icon">
+    <img class="icon" v-for="(board, index) in boardStorage" :key="board.timestamp+index" :src="board.icon" @click="onClickIcon(index)"/>
   </div>
 </div>
 </template>
@@ -15,7 +15,7 @@ export default {
   },
   data() {
     return {
-      fieldStorage: [],
+      boardStorage: [],
     }
   },
   methods: {
@@ -27,7 +27,7 @@ export default {
   watch: {
     storage: function() {
       console.log('update boards list')
-      this.fieldStorage = this.storage
+      this.boardStorage = this.storage
     }
   }
 }
@@ -54,32 +54,32 @@ export default {
     background: #fff;
 }
 
-#saved-field-icon {
+#saved-board-icon {
     text-align: left;
     display: flex;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     flex: 1;
 }
-#saved-field-icon::-webkit-scrollbar {
+#saved-board-icon::-webkit-scrollbar {
     height: 3px;
 }
-#saved-field-icon::-webkit-scrollbar-track {
+#saved-board-icon::-webkit-scrollbar-track {
     background: transparent;
     border: none;
 }
-#saved-field-icon::-webkit-scrollbar-thumb {
+#saved-board-icon::-webkit-scrollbar-thumb {
     background: #ccc;
     border-radius: 10px;
 }
 
-#saved-field-icon img {
+#saved-board-icon img {
     vertical-align: bottom;
     margin-bottom: 2px;
     height: 50px;
     border: 1px solid #888;
 }
-#saved-field-icon img:hover {
+#saved-board-icon img:hover {
     border: 1px solid #222;
 }
 
@@ -95,12 +95,12 @@ export default {
     font-weight: bold;
 }
 
-#open-new-field {
+#open-new-board {
     border: 1px solid #888;
     margin-bottom: 2px;
 }
-#open-new-field:hover,
-#open-new-field:focus {
+#open-new-board:hover,
+#open-new-board:focus {
     border-color: #222;    
 }
 </style>

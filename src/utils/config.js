@@ -4,15 +4,16 @@ export const PREVIEW_IMAGE_WIDTH = 256;
 export const CAPTURE_IMAGE_WIDTH = 1920;
 
 // capture file name
-export const CAPTURE_FILE_PREFIX = 'field_';
+export const CAPTURE_FILE_PREFIX = 'board_';
 
 // localStorage
 export const LAST_FIELD_DATA = 'lastField';
-export const FIELD_DATA_LIST = 'fields';
+export const BOARD_LIST = 'boardList';
+export const OLD_BOARD_LIST = 'fields';
 export const PLAYER_DB = 'playerDB';
 
-// import field
-//export const EXPORT_FILE_NAME_PREFIX = 'field_';
+// import board
+//export const EXPORT_FILE_NAME_PREFIX = 'board_';
 export const EXPORT_FILE_NAME_PREFIX = 'board_tucana_ga';
 export const PLAYER_DB_FILE_PREFIX = 'players_tucana_ga';
 
