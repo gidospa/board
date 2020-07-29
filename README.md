@@ -1,4 +1,4 @@
-# field
+# BOARD
 
 ## Project setup
 ```
