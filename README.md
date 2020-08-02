@@ -1,5 +1,5 @@
 # BOARD
-![Node.js CI](https://github.com/gidospa/board/workflows/Node.js%20CI/badge.svg)
+![production deploy](https://github.com/gidospa/board/workflows/production%20deploy/badge.svg)
 
 [![BOARD](https://user-images.githubusercontent.com/43918802/89122675-2e348200-d504-11ea-8ca6-8bba6f4c7184.png)](https://gidospa.github.io/board/)
 
