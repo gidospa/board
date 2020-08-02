@@ -14,8 +14,8 @@ export const PLAYER_DB = 'playerDB';
 
 // import board
 //export const EXPORT_FILE_NAME_PREFIX = 'board_';
-export const EXPORT_FILE_NAME_PREFIX = 'board_tucana_ga';
-export const PLAYER_DB_FILE_PREFIX = 'players_tucana_ga';
+export const EXPORT_FILE_NAME_PREFIX = 'board';
+export const PLAYER_DB_FILE_PREFIX = 'playerdb';
 
 // field size [m]
 export const REAL_FIELD_SIZE = {
