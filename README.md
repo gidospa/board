@@ -1,4 +1,5 @@
 # BOARD
+![Node.js CI](https://github.com/gidospa/board/workflows/Node.js%20CI/badge.svg)
 
 ## Project setup
 ```
