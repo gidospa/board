@@ -1,0 +1,21 @@
+:root {
+  font-family: "Yu Gothic", "YuGothic", Arial, sans-serif;
+  color: #444;
+  background: #f0f0f0;
+  font-size: 12pt;
+  line-height: 1.4;
+}
+.default-button {
+  font-family: "Yu Gothic", "YuGothic", Arial, sans-serif;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.25rem;
+  border: 1px solid #888;
+  background-color: white;
+  text-decoration: none;
+  color: #444;
+  font-size: 0.9rem;
+}
+.default-button:hover,
+.default-button:focus {
+    border-color: #222;
+}
