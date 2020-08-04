@@ -1,6 +1,8 @@
 name: production deploy
 
 on:
+  workflow_dispatch:
+    branches: [ master ]
   push:
     branches: [ master ]
 
