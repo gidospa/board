@@ -201,6 +201,7 @@ textarea {
   line-height: 1.4;
   vertical-align: bottom;
   font-size: 1rem;
+  border: 1px solid #888;
 }
 #changing-ends {
   font-size: 0.9rem;
