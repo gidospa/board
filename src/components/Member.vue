@@ -1,5 +1,5 @@
 <template>
-<div id="member">
+<div id="member" v-bind:class="hidden ? 'hidden' : ''">
   <div draggable="true" @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop.stop.prevent="onDropPlayerDB">
     <div id="player-db-information">
       <div :class="{'player-db-information__dragover': isDragOver}">
@@ -50,6 +50,7 @@ export default {
     members: String,
     colors: String,
     playerdb: Object,
+    hidden: Boolean,
   },
   data() {
     return {
@@ -191,6 +192,17 @@ export default {
 <style scoped>
 #member {
   padding-bottom: 2vh;
+  max-height: 100vh;
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s, visibility 0.4s, max-height 0.3s;
+}
+#member.hidden {
+  max-height: 0;
+  visibility: hidden;
+  opacity: 0;
+  padding: 0;
+  transition: opacity 0.1s, visibility 0.1s, max-height 0.2s;
 }
 textarea {
   font-family: "Yu Gothic", "YuGothic", Arial, sans-serif;

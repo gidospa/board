@@ -1,5 +1,5 @@
 <template>
-<div id="files">
+<div id="files" v-bind:class="hidden ? 'hidden' : ''">
   <div class="icon" id="append-mark" @click="$emit('save-board')">+</div>
   <div class="icon" id="open-new-board" @click="$emit('open-new-board')">New</div>
   <div id="saved-board-icon">
@@ -11,7 +11,8 @@
 <script>
 export default {
   props: {
-    storage: Array
+    storage: Array,
+    hidden: Boolean,
   },
   data() {
     return {
@@ -40,6 +41,17 @@ export default {
   margin: 20px 10px 30px;
   padding: 0rem 1rem;
   text-align: left;
+  max-height: 100vh;
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s, visibility 0.4s, max-height 0.3s;
+}
+#files.hidden {
+  margin: 0;
+  max-height: 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.1s, visibility 0.1s, max-height 0.2s;
 }
 .icon {
     display: inline-block;

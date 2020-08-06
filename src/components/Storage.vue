@@ -1,5 +1,5 @@
 <template>
-<div id="storage">
+<div id="storage" v-bind:class="hidden ? 'hidden' : ''">
   <div class="storage-button">
     <label for="import-board">Import</label>
     <input id="import-board" type="file" accept="text/plain, application/json" style="display:none" @change="onImport">
@@ -33,6 +33,7 @@ export default {
     exportBoardData: Object,
     clearBoardList: Object,
     clearAccesskey: Object,
+    hidden: Boolean,
   },
   data: function() {
     return {
@@ -208,6 +209,17 @@ export default {
   text-align: left;
   user-select: none;
   touch-action: none;
+  max-height: 100vh;
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s, visibility 0.4s, max-height 0.3s;}
+#storage.hidden {
+  margin: 0;
+  padding: 0;
+  max-height: 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.1s, visibility 0.1s, max-height 0.2s;
 }
 .storage-button {
     cursor: default;

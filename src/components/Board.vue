@@ -150,11 +150,15 @@ export default {
       if (this.fieldClick) {
         console.log('field click!!', this.fieldClick)
 
-      // click bench area
+        // click bench area
         let fieldBottom = this.isLandscape ? this.fieldClick.y : this.fieldClick.x
         if (fieldBottom > (Config.NORMALIZED.FIELD.h + Config.NORMALIZED.MARGIN.TOP)*this.fieldWidth) {
           this.noBench = this.noBench ? false : true
           this.screenResize()
+        }
+        // click play field
+        else {
+          this.$emit('hide-settings')
         }
       }
       this.fieldClick = null
@@ -193,6 +197,7 @@ export default {
     },
     fieldTouchStart(e) {
       console.log('field touch:', e.type)
+      e.preventDefault()
       this.fieldClick = this.getTouchPosition(e)
     },
     screenResize() {
@@ -332,6 +337,7 @@ export default {
 
 <style scoped>
 #view {
+  width: 100%;
   height: 98vh;
   display: flex;
   justify-content: center;

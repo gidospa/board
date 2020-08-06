@@ -6,6 +6,7 @@
     :exportBoardData="exportBoardData"
     :clearBoardList="clearBoardList"
     :clearAccesskey="clearAccesskey"
+    :hidden="hideSettings"
     @change-storage="changeStorage" 
     @capture-board="captureBoard"
     @import-board="importBoard"
@@ -14,6 +15,7 @@
   </Storage>
   <Files
     :storage="storage"
+    :hidden="hideSettings"
     @save-board="saveBoard"
     @click-icon="onClickIcon"
     @open-new-board="openNewBoard">
@@ -22,6 +24,7 @@
     :members="members"
     :colors="colors"
     :playerdb="playerDB"
+    :hidden="hideSettings"
     @change-member-list="changeMemberList"
     @change-team-colors="changeTeamColors"
     @change-ends="changeEnds"
@@ -37,7 +40,8 @@
     @change-player-info="changePlayerInfo" 
     @change-team-colors="changeTeamColors"
     @done-save="doneSave"
-    @done-capture="doneCapture">
+    @done-capture="doneCapture"
+    @hide-settings="hideSettings = hideSettings ? false : true">
   </Board>
   <Modal v-if="showModal" @close="closeModal" :type="modalType" :board="modalParam"></Modal>
 </div>
@@ -77,6 +81,7 @@ export default {
       exportBoardData: {},
       clearBoardList: {},
       clearAccesskey: {},
+      hideSettings: false,
     }
   },
   methods: {
@@ -321,11 +326,6 @@ export default {
 
     if (this.players.length == 0) {
       this.players = Players.newPlayers(null)
-    }
-  },
-  watch: {
-    players: function() {
-      console.log('watch players')
     }
   },
   computed: {
