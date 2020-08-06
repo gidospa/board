@@ -6,38 +6,38 @@
     :exportBoardData="exportBoardData"
     :clearBoardList="clearBoardList"
     :clearAccesskey="clearAccesskey"
-    @changeStorage="changeStorage" 
-    @captureBoard="captureBoard"
-    @importBoard="importBoard"
-    @exportBoard="exportBoard"
-    @clearLocalStorage="clearLocalStorage">
+    @change-storage="changeStorage" 
+    @capture-board="captureBoard"
+    @import-board="importBoard"
+    @export-board="exportBoard"
+    @clear-local-storage="clearLocalStorage">
   </Storage>
   <Files
     :storage="storage"
-    @saveBoard="saveBoard"
-    @clickIcon="onClickIcon"
-    @openNewBoard="openNewBoard">
+    @save-board="saveBoard"
+    @click-icon="onClickIcon"
+    @open-new-board="openNewBoard">
   </Files>
   <Member
     :members="members"
     :colors="colors"
     :playerdb="playerDB"
-    @changeMemberList="changeMemberList"
-    @changeTeamColors="changeTeamColors"
-    @changeEnds="changeEnds"
-    @showTeamId="showTeamId"
-    @loadPlayerDB="loadPlayerDB">
+    @change-member-list="changeMemberList"
+    @change-team-colors="changeTeamColors"
+    @change-ends="changeEnds"
+    @show-team-id="showTeamId"
+    @load-player-db="loadPlayerDB">
   </Member>
   <Board 
     :colors="colors"
     :save="doSave"
     :capture="doCapture"
     :playerInfo="players"
-    @updatePlayerPosition="updatePlayerPosition"
-    @changePlayerInfo="changePlayerInfo" 
-    @changeTeamColors="changeTeamColors"
-    @doneSave="doneSave"
-    @doneCapture="doneCapture">
+    @update-player-position="updatePlayerPosition"
+    @change-player-info="changePlayerInfo" 
+    @change-team-colors="changeTeamColors"
+    @done-save="doneSave"
+    @done-capture="doneCapture">
   </Board>
   <Modal v-if="showModal" @close="closeModal" :type="modalType" :board="modalParam"></Modal>
 </div>

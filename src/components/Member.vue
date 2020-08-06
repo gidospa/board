@@ -3,7 +3,7 @@
   <div draggable="true" @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop.stop.prevent="onDropPlayerDB">
     <div id="player-db-information">
       <div :class="{'player-db-information__dragover': isDragOver}">
-        <span class="player-db-information__text" @click="$emit('showTeamId')">Player DB</span>
+        <span class="player-db-information__text" @click="$emit('show-team-id')">Player DB</span>
       </div>
     </div>
     <div class="member">
@@ -84,10 +84,10 @@ export default {
       let m = newMember.split('\n\n')
       this.home = m[0]
       this.away = m[1]
-      this.$emit("changeMemberList", newMember, teamName)
+      this.$emit("change-member-list", newMember, teamName)
     },
     onClickChange() {
-      this.$emit('changeEnds')
+      this.$emit('change-ends')
     },
     onDragOver() {
       if (!this.playerdb) {
@@ -133,7 +133,7 @@ export default {
             }
             if (i == teams.length) {
               console.log('playerDB updated')
-              this.$emit('loadPlayerDB', playerDB)
+              this.$emit('load-player-db', playerDB)
             }
           }
           else {
@@ -168,10 +168,10 @@ export default {
       this.awayColor = c[1]
     },
     homeColor: function() {
-      this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
+      this.$emit('change-team-colors', `${this.homeColor},${this.awayColor}`)
     },
     awayColor: function() {
-      this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
+      this.$emit('change-team-colors', `${this.homeColor},${this.awayColor}`)
     },
     playerdb: function() {
       let pdb = document.getElementById('player-db-information')

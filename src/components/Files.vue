@@ -1,7 +1,7 @@
 <template>
 <div id="files">
-  <div class="icon" id="append-mark" @click="$emit('saveBoard')">+</div>
-  <div class="icon" id="open-new-board" @click="$emit('openNewBoard')">New</div>
+  <div class="icon" id="append-mark" @click="$emit('save-board')">+</div>
+  <div class="icon" id="open-new-board" @click="$emit('open-new-board')">New</div>
   <div id="saved-board-icon">
     <img class="icon" v-for="(board, index) in boardStorage" :key="board.timestamp+index" :src="board.icon" @click="onClickIcon(index)"/>
   </div>
@@ -21,7 +21,7 @@ export default {
   methods: {
     onClickIcon(index) {
       console.log("click icon", index)
-      this.$emit("clickIcon", index)
+      this.$emit("click-icon", index)
     }
   },
   watch: {

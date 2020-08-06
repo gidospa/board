@@ -161,7 +161,7 @@ export default {
     },
     mouseUp() {
       if (this.selectedPlayer) {
-        this.$emit('updatePlayerPosition', this.players)
+        this.$emit('update-player-position', this.players)
       }
       if (this.selectedPlayer || this.fieldClick) {
         console.log('mouseUp')
@@ -183,7 +183,7 @@ export default {
           if (p.length > 1) {
             name = p[1].trim()
           }
-          this.$emit('changePlayerInfo', this.selectedPlayer, number, name)
+          this.$emit('change-player-info', this.selectedPlayer, number, name)
         }
       }
     },
@@ -299,7 +299,7 @@ export default {
         w: Config.PREVIEW_IMAGE_WIDTH,
         onLoad: (url) => {
           let now = new Date()
-          this.$emit("doneSave",
+          this.$emit("done-save",
             {
               players: this.players,
               color: this.teamColor,
@@ -320,7 +320,7 @@ export default {
         },
         w: Config.CAPTURE_IMAGE_WIDTH,
         onLoad: (url) => {
-          this.$emit("doneCapture", url)
+          this.$emit("done-capture", url)
         },
         isLandscape: this.isLandscape,
         noBench: this.noBench
