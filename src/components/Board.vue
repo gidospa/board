@@ -337,7 +337,6 @@ export default {
 
 <style scoped>
 #view {
-  width: 100%;
   height: 98vh;
   display: flex;
   justify-content: center;
