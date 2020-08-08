@@ -102,7 +102,7 @@ export default {
       teams.forEach((team, teamId) => {
         if (team == "") return
         newTeams[teamId] = team.split('\n')
-        if (this.playerDB['teams'] && this.playerDB['teams'][teamName[teamId]]) {
+        if (this.playerDB && this.playerDB['teams'] && this.playerDB['teams'][teamName[teamId]]) {
           newTeams[teamId].playerDB = this.playerDB['teams'][teamName[teamId]].players
         }
       })
