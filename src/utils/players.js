@@ -9,7 +9,7 @@ function newPlayers(formations) {
   let number_of_rows = 2;
   let number_of_cols = Config.NUMBER_OF_PLAYERS/number_of_rows;
   let eachWidth = Config.NORMALIZED.BENCH.w/Config.NUMBER_OF_TEAMS/number_of_cols;
-  let eachHeight = (Config.NORMALIZED.BENCH.h + Config.NORMALIZED.MARGIN.BOTTOM)/number_of_rows;
+  let eachHeight = (Config.NORMALIZED.BENCH.h + Config.NORMALIZED.MARGIN.BOTTOM)/number_of_rows*0.93;
   for (let team = 0; team < Config.NUMBER_OF_TEAMS; team++) {
     let startX = eachWidth/2 + Config.NORMALIZED.BENCH.w/2*team;
     let startY = Config.NORMALIZED.BENCH.TOP - Config.NORMALIZED.MARGIN.BOTTOM + eachHeight/2;
