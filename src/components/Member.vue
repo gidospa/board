@@ -1,6 +1,6 @@
 <template>
 <div id="member" v-bind:class="hidden ? 'hidden' : ''">
-  <div draggable="true" @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop.stop.prevent="onDropPlayerDB">
+  <div @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop.stop.prevent="onDropPlayerDB">
     <div id="player-db-information">
       <div :class="{'player-db-information__dragover': isDragOver}">
         <span class="player-db-information__text" @click="$emit('show-team-id')">Player DB</span>
