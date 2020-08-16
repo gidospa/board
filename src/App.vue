@@ -21,11 +21,11 @@
     @open-new-board="openNewBoard">
   </Files>
   <Member
-    :members="members"
+    :lineup="lineup"
     :colors="colors"
     :playerdb="playerDB"
     :hidden="hideSettings"
-    @change-member-list="changeMemberList"
+    @change-lineup="changeLineup"
     @change-team-colors="changeTeamColors"
     @change-ends="changeEnds"
     @show-team-id="showTeamId"
@@ -96,8 +96,8 @@ export default {
       this.players = players
       this.saveToLocalStorage()
     },
-    changeMemberList(memberList, teamName) {
-      let teams = memberList.split('\n\n')
+    changeLineup(lineup, teamName) {
+      let teams = lineup.split('\n\n')
       let newTeams = {}
       teams.forEach((team, teamId) => {
         if (team == "") return
@@ -107,10 +107,12 @@ export default {
         }
       })
       this.players.forEach((player) => {
-        let newPlayer = newTeams[player.team][player.id].split(',')
-        player.number = newPlayer[0]
-        player.name = newPlayer[1]
-        if (!player.name && newTeams[player.team].playerDB) {
+        if (newTeams[player.team] && newTeams[player.team][player.id]) {
+          let newPlayer = newTeams[player.team][player.id].split(',')
+          player.number = newPlayer[0]
+          player.name = newPlayer[1]
+        }
+        if (!player.name && newTeams[player.team] && newTeams[player.team].playerDB) {
           let name = newTeams[player.team].playerDB[player.number]
           if (name) {
             player.name = name
@@ -329,24 +331,24 @@ export default {
     }
   },
   computed: {
-    members: function() {
+    lineup: function() {
       // sort by 'team' and 'id'
-      let members = [Array(this.players.length), Array(this.players.length)]
+      let numberAndName = [Array(this.players.length), Array(this.players.length)]
       for (let p of this.players) {
-        members[p.team][p.id] = `${p.number},${p.name}`
+        numberAndName[p.team][p.id] = `${p.number},${p.name}`
       }
 
       // to string
-      let strMembers = ''
+      let strLineup = ''
       for (let team = 0; team < 2; team++) {
-        for (let p of members[team]) {
+        for (let p of numberAndName[team]) {
           if (p) {
-            strMembers += p + '\n'
+            strLineup += p + '\n'
           }
         }
-        strMembers += '\n' // seperator of each team
+        strLineup += '\n' // seperator of each team
       }
-      return strMembers
+      return strLineup
     }
   }
 }
