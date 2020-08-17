@@ -20,7 +20,7 @@
     @click-icon="onClickIcon"
     @open-new-board="openNewBoard">
   </Files>
-  <Member
+  <Lineup
     :lineup="lineup"
     :colors="colors"
     :playerdb="playerDB"
@@ -30,7 +30,7 @@
     @change-ends="changeEnds"
     @show-team-id="showTeamId"
     @load-player-db="loadPlayerDB">
-  </Member>
+  </Lineup>
   <Board 
     :colors="colors"
     :save="doSave"
@@ -49,7 +49,7 @@
 
 <script>
 import Board from './components/Board.vue'
-import Member from './components/Member.vue'
+import Lineup from './components/Lineup.vue'
 import Files from './components/Files.vue'
 import Storage from './components/Storage.vue'
 import Modal from './components/Modal.vue'
@@ -61,7 +61,7 @@ export default {
   name: 'App',
   components: {
     Board,
-    Member,
+    Lineup,
     Files,
     Storage,
     Modal
