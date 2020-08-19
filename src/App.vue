@@ -6,38 +6,42 @@
     :exportBoardData="exportBoardData"
     :clearBoardList="clearBoardList"
     :clearAccesskey="clearAccesskey"
-    @changeStorage="changeStorage" 
-    @captureBoard="captureBoard"
-    @importBoard="importBoard"
-    @exportBoard="exportBoard"
-    @clearLocalStorage="clearLocalStorage">
+    :hidden="hideSettings"
+    @change-storage="changeStorage" 
+    @capture-board="captureBoard"
+    @import-board="importBoard"
+    @export-board="exportBoard"
+    @clear-local-storage="clearLocalStorage">
   </Storage>
   <Files
     :storage="storage"
-    @saveBoard="saveBoard"
-    @clickIcon="onClickIcon"
-    @openNewBoard="openNewBoard">
+    :hidden="hideSettings"
+    @save-board="saveBoard"
+    @click-icon="onClickIcon"
+    @open-new-board="openNewBoard">
   </Files>
-  <Member
-    :members="members"
+  <Lineup
+    :lineup="lineup"
     :colors="colors"
     :playerdb="playerDB"
-    @changeMemberList="changeMemberList"
-    @changeTeamColors="changeTeamColors"
-    @changeEnds="changeEnds"
-    @showTeamId="showTeamId"
-    @loadPlayerDB="loadPlayerDB">
-  </Member>
+    :hidden="hideSettings"
+    @change-lineup="changeLineup"
+    @change-team-colors="changeTeamColors"
+    @change-ends="changeEnds"
+    @show-team-id="showTeamId"
+    @load-player-db="loadPlayerDB">
+  </Lineup>
   <Board 
     :colors="colors"
     :save="doSave"
     :capture="doCapture"
     :playerInfo="players"
-    @updatePlayerPosition="updatePlayerPosition"
-    @changePlayerInfo="changePlayerInfo" 
-    @changeTeamColors="changeTeamColors"
-    @doneSave="doneSave"
-    @doneCapture="doneCapture">
+    @update-player-position="updatePlayerPosition"
+    @change-player-info="changePlayerInfo" 
+    @change-team-colors="changeTeamColors"
+    @done-save="doneSave"
+    @done-capture="doneCapture"
+    @hide-settings="hideSettings = hideSettings ? false : true">
   </Board>
   <Modal v-if="showModal" @close="closeModal" :type="modalType" :board="modalParam"></Modal>
 </div>
@@ -45,7 +49,7 @@
 
 <script>
 import Board from './components/Board.vue'
-import Member from './components/Member.vue'
+import Lineup from './components/Lineup.vue'
 import Files from './components/Files.vue'
 import Storage from './components/Storage.vue'
 import Modal from './components/Modal.vue'
@@ -57,7 +61,7 @@ export default {
   name: 'App',
   components: {
     Board,
-    Member,
+    Lineup,
     Files,
     Storage,
     Modal
@@ -77,6 +81,7 @@ export default {
       exportBoardData: {},
       clearBoardList: {},
       clearAccesskey: {},
+      hideSettings: false,
     }
   },
   methods: {
@@ -91,21 +96,23 @@ export default {
       this.players = players
       this.saveToLocalStorage()
     },
-    changeMemberList(memberList, teamName) {
-      let teams = memberList.split('\n\n')
+    changeLineup(lineup, teamName) {
+      let teams = lineup.split('\n\n')
       let newTeams = {}
       teams.forEach((team, teamId) => {
         if (team == "") return
         newTeams[teamId] = team.split('\n')
-        if (this.playerDB['teams'] && this.playerDB['teams'][teamName[teamId]]) {
+        if (this.playerDB && this.playerDB['teams'] && this.playerDB['teams'][teamName[teamId]]) {
           newTeams[teamId].playerDB = this.playerDB['teams'][teamName[teamId]].players
         }
       })
       this.players.forEach((player) => {
-        let newPlayer = newTeams[player.team][player.id].split(',')
-        player.number = newPlayer[0]
-        player.name = newPlayer[1]
-        if (!player.name && newTeams[player.team].playerDB) {
+        if (newTeams[player.team] && newTeams[player.team][player.id]) {
+          let newPlayer = newTeams[player.team][player.id].split(',')
+          player.number = newPlayer[0]
+          player.name = newPlayer[1]
+        }
+        if (!player.name && newTeams[player.team] && newTeams[player.team].playerDB) {
           let name = newTeams[player.team].playerDB[player.number]
           if (name) {
             player.name = name
@@ -323,30 +330,25 @@ export default {
       this.players = Players.newPlayers(null)
     }
   },
-  watch: {
-    players: function() {
-      console.log('watch players')
-    }
-  },
   computed: {
-    members: function() {
+    lineup: function() {
       // sort by 'team' and 'id'
-      let members = [Array(this.players.length), Array(this.players.length)]
+      let numberAndName = [Array(this.players.length), Array(this.players.length)]
       for (let p of this.players) {
-        members[p.team][p.id] = `${p.number},${p.name}`
+        numberAndName[p.team][p.id] = `${p.number},${p.name}`
       }
 
       // to string
-      let strMembers = ''
+      let strLineup = ''
       for (let team = 0; team < 2; team++) {
-        for (let p of members[team]) {
+        for (let p of numberAndName[team]) {
           if (p) {
-            strMembers += p + '\n'
+            strLineup += p + '\n'
           }
         }
-        strMembers += '\n' // seperator of each team
+        strLineup += '\n' // seperator of each team
       }
-      return strMembers
+      return strLineup
     }
   }
 }
@@ -357,5 +359,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: cneter;
 }
 </style>

@@ -1,13 +1,13 @@
 <template>
-<div id="storage">
+<div id="storage" v-bind:class="hidden ? 'hidden' : ''">
   <div class="storage-button">
     <label for="import-board">Import</label>
     <input id="import-board" type="file" accept="text/plain, application/json" style="display:none" @change="onImport">
   </div>
-  <div class="storage-button" @click="$emit('exportBoard')">
+  <div class="storage-button" @click="$emit('export-board')">
     Export
   </div>
-  <div class="storage-button" @click="$emit('captureBoard')">
+  <div class="storage-button" @click="$emit('capture-board')">
     Capture
   </div>
   <span class="blank">&nbsp;</span>
@@ -17,7 +17,7 @@
   <div v-show="isGoogleAvailable" id="google" class="storage-button" @click="googleStorage">
     Google
   </div>
-  <div class="storage-button" id="clear-local-storage" @click="$emit('clearLocalStorage')">
+  <div class="storage-button" id="clear-local-storage" @click="$emit('clear-local-storage')">
     Clear
   </div>
 </div>
@@ -33,6 +33,7 @@ export default {
     exportBoardData: Object,
     clearBoardList: Object,
     clearAccesskey: Object,
+    hidden: Boolean,
   },
   data: function() {
     return {
@@ -48,7 +49,7 @@ export default {
         this.currentStorage.disconnect && this.currentStorage.disconnect()
         this.currentStorage = local
         local.fetch(() => {
-          this.$emit('changeStorage', this.currentStorage)
+          this.$emit('change-storage', this.currentStorage)
         })
       }
       else {
@@ -61,7 +62,7 @@ export default {
             let ggl = document.getElementById('google')
             ggl.classList.remove('connected')
           }
-          this.$emit('changeStorage', this.currentStorage)
+          this.$emit('change-storage', this.currentStorage)
           const ggl = document.getElementById('google')
           ggl.classList.add('connected')
         }, (e) => {
@@ -75,7 +76,7 @@ export default {
         this.currentStorage.disconnect && this.currentStorage.disconnect()
         this.currentStorage = local
         local.fetch(() => {
-          this.$emit('changeStorage', this.currentStorage)
+          this.$emit('change-storage', this.currentStorage)
         })
       }
       else {
@@ -88,7 +89,7 @@ export default {
             let dbx = document.getElementById('dropbox')
             dbx.classList.remove('connected')
           }
-          this.$emit('changeStorage', this.currentStorage)
+          this.$emit('change-storage', this.currentStorage)
           let dbx = document.getElementById('dropbox')
           dbx.classList.add('connected')
         }, (e) => {
@@ -105,7 +106,7 @@ export default {
         try {
           let board = JSON.parse(reader.result)
           if (board) {
-            this.$emit('importBoard', {players:board.players, color:board.color})
+            this.$emit('import-board', {players:board.players, color:board.color})
           }
         }
         catch (e) {
@@ -151,7 +152,7 @@ export default {
   mounted() {
     this.currentStorage = local
     this.currentStorage.fetch()
-    this.$emit('changeStorage', this.currentStorage)
+    this.$emit('change-storage', this.currentStorage)
     
     // initialize Dropbox
     dropbox.startConnecting = function() {
@@ -179,7 +180,7 @@ export default {
           let dbx = document.getElementById('dropbox')
           dbx.classList.remove('connected')
         }
-        this.$emit('changeStorage', this.currentStorage)
+        this.$emit('change-storage', this.currentStorage)
         let dbx = document.getElementById('dropbox')
         dbx.classList.add('connected')
       }, (e) => {
@@ -208,6 +209,17 @@ export default {
   text-align: left;
   user-select: none;
   touch-action: none;
+  max-height: 100vh;
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s, visibility 0.4s, max-height 0.3s;}
+#storage.hidden {
+  margin: 0;
+  padding: 0;
+  max-height: 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.1s, visibility 0.1s, max-height 0.2s;
 }
 .storage-button {
     cursor: default;

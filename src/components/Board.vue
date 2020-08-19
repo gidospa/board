@@ -150,18 +150,22 @@ export default {
       if (this.fieldClick) {
         console.log('field click!!', this.fieldClick)
 
-      // click bench area
+        // click bench area
         let fieldBottom = this.isLandscape ? this.fieldClick.y : this.fieldClick.x
         if (fieldBottom > (Config.NORMALIZED.FIELD.h + Config.NORMALIZED.MARGIN.TOP)*this.fieldWidth) {
           this.noBench = this.noBench ? false : true
           this.screenResize()
+        }
+        // click play field
+        else {
+          this.$emit('hide-settings')
         }
       }
       this.fieldClick = null
     },
     mouseUp() {
       if (this.selectedPlayer) {
-        this.$emit('updatePlayerPosition', this.players)
+        this.$emit('update-player-position', this.players)
       }
       if (this.selectedPlayer || this.fieldClick) {
         console.log('mouseUp')
@@ -183,7 +187,7 @@ export default {
           if (p.length > 1) {
             name = p[1].trim()
           }
-          this.$emit('changePlayerInfo', this.selectedPlayer, number, name)
+          this.$emit('change-player-info', this.selectedPlayer, number, name)
         }
       }
     },
@@ -193,6 +197,7 @@ export default {
     },
     fieldTouchStart(e) {
       console.log('field touch:', e.type)
+      e.preventDefault()
       this.fieldClick = this.getTouchPosition(e)
     },
     screenResize() {
@@ -299,7 +304,7 @@ export default {
         w: Config.PREVIEW_IMAGE_WIDTH,
         onLoad: (url) => {
           let now = new Date()
-          this.$emit("doneSave",
+          this.$emit("done-save",
             {
               players: this.players,
               color: this.teamColor,
@@ -320,7 +325,7 @@ export default {
         },
         w: Config.CAPTURE_IMAGE_WIDTH,
         onLoad: (url) => {
-          this.$emit("doneCapture", url)
+          this.$emit("done-capture", url)
         },
         isLandscape: this.isLandscape,
         noBench: this.noBench

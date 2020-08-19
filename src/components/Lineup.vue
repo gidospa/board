@@ -1,24 +1,24 @@
 <template>
-<div id="member">
-  <div draggable="true" @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop.stop.prevent="onDropPlayerDB">
+<div id="lineup" v-bind:class="hidden ? 'hidden' : ''">
+  <div @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop.stop.prevent="onDropPlayerDB">
     <div id="player-db-information">
       <div :class="{'player-db-information__dragover': isDragOver}">
-        <span class="player-db-information__text" @click="$emit('showTeamId')">Player DB</span>
+        <span class="player-db-information__text" @click="$emit('show-team-id')">Player DB</span>
       </div>
     </div>
-    <div class="member">
+    <div class="lineup">
       <input class="team-color" type="color" v-model="homeColor" list="colorList" />
     </div>
-    <div class="member">
+    <div class="lineup">
       <textarea v-model="home" @blur="onBlur()" spellcheck="false"/>
     </div>
-    <div class="member">
+    <div class="lineup">
       <button class="default-button" type="button" onfocus="this.blur()" id="changing-ends" @click="onClickChange">Changing ends</button>
     </div>
-    <div class="member">
+    <div class="lineup">
       <textarea v-model="away" @blur="onBlur()" spellcheck="false"/>
     </div>
-    <div class="member">
+    <div class="lineup">
       <input class="team-color" type="color" v-model="awayColor" list="colorList" />
     </div>
     <datalist id="colorList">
@@ -47,9 +47,10 @@
 <script>
 export default {
   props: {
-    members: String,
+    lineup: String,
     colors: String,
     playerdb: Object,
+    hidden: Boolean,
   },
   data() {
     return {
@@ -62,13 +63,19 @@ export default {
   },
   methods: {
     onBlur() {
+      if (!this.home.match(/\S/g) || !this.away.match(/\S/g)) {
+        let m = this.lineup.split('\n\n')
+        this.home = m[0]
+        this.away = m[1]
+        return
+      }
       let teams = [this.home, this.away]
-      let newMember = ''
+      let newLineup = ''
       let teamName = []
       for (let team of teams) {
-        let member = team.split('\n')
-        teamName.push(member[0])
-        for (let player of member) {
+        let lines = team.split('\n')
+        teamName.push(lines[0])
+        for (let player of lines) {
           let info = player.split(',')
           let number = parseInt(info[0])
           if (!number) continue // ignore this player information
@@ -77,17 +84,20 @@ export default {
           if (info[1]) {
             name = info[1].trim()
           }
-          newMember += `${number},${name}\n`
+          newLineup += `${number},${name}\n`
         }
-        newMember += `\n`
+        if (newLineup == '') {
+          newLineup += '\n'
+        }
+        newLineup += '\n'
       }
-      let m = newMember.split('\n\n')
+      let m = this.lineup.split('\n\n')
       this.home = m[0]
       this.away = m[1]
-      this.$emit("changeMemberList", newMember, teamName)
+      this.$emit("change-lineup", newLineup, teamName)
     },
     onClickChange() {
-      this.$emit('changeEnds')
+      this.$emit('change-ends')
     },
     onDragOver() {
       if (!this.playerdb) {
@@ -133,7 +143,7 @@ export default {
             }
             if (i == teams.length) {
               console.log('playerDB updated')
-              this.$emit('loadPlayerDB', playerDB)
+              this.$emit('load-player-db', playerDB)
             }
           }
           else {
@@ -148,7 +158,7 @@ export default {
     }
   },
   created() {
-    let m = this.members.split('\n\n')
+    let m = this.lineup.split('\n\n')
     this.home = m[0]
     this.away = m[1]
 
@@ -157,8 +167,8 @@ export default {
     this.awayColor = c[1]   
   },
   watch: {
-    members: function(newMember) {
-      let m = newMember.split('\n\n')
+    lineup: function(newLineup) {
+      let m = newLineup.split('\n\n')
       this.home = m[0]
       this.away = m[1]
     },
@@ -168,10 +178,10 @@ export default {
       this.awayColor = c[1]
     },
     homeColor: function() {
-      this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
+      this.$emit('change-team-colors', `${this.homeColor},${this.awayColor}`)
     },
     awayColor: function() {
-      this.$emit('changeTeamColors', `${this.homeColor},${this.awayColor}`)
+      this.$emit('change-team-colors', `${this.homeColor},${this.awayColor}`)
     },
     playerdb: function() {
       let pdb = document.getElementById('player-db-information')
@@ -189,8 +199,19 @@ export default {
 </script>
 
 <style scoped>
-#member {
+#lineup {
   padding-bottom: 2vh;
+  max-height: 100vh;
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.4s, visibility 0.4s, max-height 0.3s;
+}
+#lineup.hidden {
+  max-height: 0;
+  visibility: hidden;
+  opacity: 0;
+  padding: 0;
+  transition: opacity 0.1s, visibility 0.1s, max-height 0.2s;
 }
 textarea {
   font-family: "Yu Gothic", "YuGothic", Arial, sans-serif;
@@ -201,11 +222,12 @@ textarea {
   line-height: 1.4;
   vertical-align: bottom;
   font-size: 1rem;
+  border: 1px solid #888;
 }
 #changing-ends {
   font-size: 0.9rem;
 }
-.member {
+.lineup {
   display: inline-block;
   vertical-align: bottom;
   margin: 0 1rem;
