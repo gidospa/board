@@ -1,4 +1,4 @@
-# jPlayers
+# jPlayer
 Get numbers and names of j-league players from J.LEAGUE.jp (https://www.jleague.jp)
 
 players.json
