@@ -47,7 +47,7 @@ def get_players(team):
         for tr in trs:
             number = tr.find_element_by_tag_name('th').text
             td = tr.find_element_by_tag_name('td')
-            name = td.find_elements_by_tag_name('a')[1].text
+            name = td.find_elements_by_tag_name('img')[0].get_attribute('alt')
             if number:
                 for item in name.split(' '):
                     if len(item) == len(re.findall('[A-Z]', item)):
