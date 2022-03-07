@@ -16,15 +16,18 @@ import chromedriver_binary
 
 def get_teams():
     teams = {}
-    driver.get("https://www.jleague.jp/en/club/")
+    driver.get("https://www.jleague.co/clubs/")
     try:
-        leagues = driver.find_elements_by_css_selector('ul.pcImg')
+        leagues = driver.find_elements_by_class_name('clubs-container')
         j = 1
         for league in leagues:
             teams[j] = []
             clubs = league.find_elements_by_tag_name('a')
             for club in clubs:
-                teams[j].append(club.get_attribute('href').split('/')[-2])
+                team_name = club.get_attribute('href').split('/')[-2]
+                team_avatar = club.find_element_by_class_name('team-avatar')
+                short_name = team_avatar.get_attribute('alt').split(' ')[0]
+                teams[j].append((team_name, short_name))
             j += 1
         return teams
     except Exception as e:
@@ -34,20 +37,18 @@ def get_teams():
 
 def get_players(team):
     players = {}
-    driver.get("https://www.jleague.jp/en/club/%s/#player" % team)
+    driver.get("https://www.jleague.co/clubs/%s/" % team)
     try:
-        WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'playerData')))
+        WebDriverWait(driver, 15).until(EC.presence_of_all_elements_located((By.CLASS_NAME, 'player-item')))
     except TimeoutException as te:
         print(te)
         return{}
     try:
-        tableElem = driver.find_element_by_class_name('playerData')
-        tbody = tableElem.find_element_by_tag_name('tbody')
-        trs = tbody.find_elements_by_tag_name('tr')
-        for tr in trs:
-            number = tr.find_element_by_tag_name('th').text
-            td = tr.find_element_by_tag_name('td')
-            name = td.find_elements_by_tag_name('img')[0].get_attribute('alt')
+        profile = driver.find_element_by_id('players')
+        player_list = profile.find_elements_by_class_name('player-item')
+        for player in player_list:
+            number = player.find_element_by_class_name('uniform-no').text
+            name = player.find_element_by_class_name('name').text
             if number:
                 for item in name.split(' '):
                     if len(item) == len(re.findall('[A-Z]', item)):
@@ -94,14 +95,14 @@ if __name__ == "__main__":
     teams = get_teams()
     for i in teams:
         print("J%s" % i, file=sys.stderr)
-        for team in teams[i]:
+        for (team, short_name) in teams[i]:
             print(team, file=sys.stderr)
-            all_players["teams"][team] = {
+            all_players["teams"][short_name] = {
                 "nationality": "JPN",
                 "category": "J%d" % i,
             }
             players = get_players(team)
-            all_players["teams"][team]["players"] = players
+            all_players["teams"][short_name]["players"] = players
 
     driver.quit()
 
